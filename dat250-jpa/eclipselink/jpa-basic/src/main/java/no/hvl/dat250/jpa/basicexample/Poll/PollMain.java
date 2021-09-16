@@ -4,6 +4,7 @@ import no.hvl.dat250.jpa.basicexample.Poll.Poll;
 import no.hvl.dat250.jpa.basicexample.Poll.User;
 import no.hvl.dat250.jpa.basicexample.Poll.Vote;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -14,7 +15,7 @@ import javax.persistence.Query;
 import static org.junit.Assert.assertTrue;
 
 public class PollMain {
-    private static final String PERSISTENCE_UNIT_NAME = "people";
+    private static final String PERSISTENCE_UNIT_NAME = "user";
     private static EntityManagerFactory factory;
 
     public static void main(String[] args) {
@@ -25,7 +26,7 @@ public class PollMain {
         em.getTransaction().begin();
 
         // read the existing entries
-        Query q = em.createQuery("select m from Person2 m");
+        Query q = em.createQuery("select u from User u");
         // Persons should be empty
 
         // do we have entries?
@@ -34,19 +35,33 @@ public class PollMain {
         // No, so lets create new entries
         if (createNewEntries) {
             assertTrue(q.getResultList().size() == 0);
-            Family family = new Family();
-            family.setDescription("Family for the Knopfs");
-            em.persist(family);
-            for (int i = 0; i < 40; i++) {
-                Person2 person = new Person2();
-                person.setFirstName("Jim_" + i);
-                person.setLastName("Knopf_" + i);
-                em.persist(person);
-                // now persists the family person relationship
-                family.getMembers().add(person);
-                em.persist(person);
-                em.persist(family);
-            }
+
+            //Create user
+            User user = new User();
+            user.setName("Max Musterman");
+            user.setEmail("m.musterman@gmail.com");
+
+            //Create poll & votes
+
+            Poll poll = new Poll();
+            poll.setName("Simple poll");
+            poll.setQuestion("Is this a question?");
+
+            List<Vote> votes = new ArrayList<>();
+            Vote vote = new Vote();
+            vote.setAnswer(1);
+            Vote vote2 = new Vote();
+            vote.setAnswer(0);
+            votes.add(vote);
+            votes.add(vote2);
+            poll.setVotes(votes);
+
+            em.persist(user);
+            em.persist(poll);
+            em.persist(vote);
+            em.persist(vote2);
+            em.persist(votes);
+
         }
 
         // Commit the transaction, which will cause the entity to
@@ -57,27 +72,6 @@ public class PollMain {
         // resources are conserved.
         // read the existing entries and write to console
 
-        Query q2 = em.createQuery("select p from Person2 p");
-        List<Person2> todoList = q.getResultList();
-        for (Person2 todo : todoList) {
-            System.out.println(todo.getFirstName() + " " + todo.getLastName() + ", Job(s): " + todo.getJobList() + ", Family: " + todo.getFamily());
-        }
-
-        Query q3 = em.createQuery("select f from Family f");
-        List<Family> familyList = q.getResultList();
-        for (Family fam : familyList) {
-            System.out.println("Family: " + fam.getMembers());
-        }
-
-        // create new todo
-        /**
-         em.getTransaction().begin();
-         Person2 todo = new Person2();
-         todo.setFirstName("Kristian");
-         todo.setLastName("Avlesbug");
-         em.persist(todo);
-         em.getTransaction().commit();
-         **/
         em.close();
 
     }
