@@ -1,1 +1,3 @@
 /target/
+dat250-jpa/eclipselink/jpa-basic/src/main/resources/META-INF/persistence.xml
+dat250-jpa/eclipselink/jpa-basic/pom.xml
