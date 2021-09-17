@@ -13,7 +13,7 @@ public class Poll {
     private String name;
     private String question;
 
-
+    @Id
     public Long getId() {
         return id;
     }
@@ -38,10 +38,11 @@ public class Poll {
         this.question = question;
     }
 
+
     @ManyToOne
-    private User user;
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
+    private PollUser pollUser;
+    public PollUser getPollUser() { return pollUser; }
+    public void setUser(PollUser pollUser) { this.pollUser = pollUser; }
 
     @OneToMany
     @JoinTable(name = "jnd_vote_poll",

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "user")
-public class User {
+@Table(name = "polluser")
+public class PollUser {
         @Id
         @GeneratedValue(strategy = GenerationType.AUTO)
         private Long id;
@@ -14,7 +14,7 @@ public class User {
         private String email;
         private String password;
 
-
+    @Id
     public Long getId() {
         return id;
     }
@@ -46,10 +46,12 @@ public class User {
     }
 
     @OneToMany
-    @JoinTable(name = "jnd_poll_user",
-            joinColumns = @JoinColumn(name = "user_fk"),
+    @JoinTable(name = "jnd_poll_pllusr",
+            joinColumns = @JoinColumn(name = "polluser_fk"),
             inverseJoinColumns = @JoinColumn(name = "poll_fk"))
-    private List<Poll> pollList = new ArrayList<>();
+    private List<Poll> pollList = new ArrayList<Poll>();
     public List<Poll> getPollList() { return pollList; }
     public void setPollList(List<Poll> pollList) { this.pollList = pollList; }
 }
+
+

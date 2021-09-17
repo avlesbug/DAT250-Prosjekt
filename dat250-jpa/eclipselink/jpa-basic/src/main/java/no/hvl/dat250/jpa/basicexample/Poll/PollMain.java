@@ -1,9 +1,5 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
-import no.hvl.dat250.jpa.basicexample.Poll.Poll;
-import no.hvl.dat250.jpa.basicexample.Poll.User;
-import no.hvl.dat250.jpa.basicexample.Poll.Vote;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +11,7 @@ import javax.persistence.Query;
 import static org.junit.Assert.assertTrue;
 
 public class PollMain {
-    private static final String PERSISTENCE_UNIT_NAME = "user";
+    private static final String PERSISTENCE_UNIT_NAME = "people";
     private static EntityManagerFactory factory;
 
     public static void main(String[] args) {
@@ -26,7 +22,7 @@ public class PollMain {
         em.getTransaction().begin();
 
         // read the existing entries
-        Query q = em.createQuery("select u from User u");
+        Query q = em.createQuery("select u from PollUser u");
         // Persons should be empty
 
         // do we have entries?
@@ -37,15 +33,20 @@ public class PollMain {
             assertTrue(q.getResultList().size() == 0);
 
             //Create user
-            User user = new User();
-            user.setName("Max Musterman");
-            user.setEmail("m.musterman@gmail.com");
+            PollUser pollUser = new PollUser();
+            pollUser.setName("Max Musterman");
+            pollUser.setEmail("m.musterman@gmail.com");
 
             //Create poll & votes
 
             Poll poll = new Poll();
+            List<Poll> pollList = new ArrayList<>();
             poll.setName("Simple poll");
             poll.setQuestion("Is this a question?");
+            //System.out.println(poll.getId());
+            pollList.add(poll);
+            pollUser.setPollList(pollList);
+
 
             List<Vote> votes = new ArrayList<>();
             Vote vote = new Vote();
@@ -56,11 +57,10 @@ public class PollMain {
             votes.add(vote2);
             poll.setVotes(votes);
 
-            em.persist(user);
+            em.persist(pollUser);
             em.persist(poll);
             em.persist(vote);
             em.persist(vote2);
-            em.persist(votes);
 
         }
 

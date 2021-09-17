@@ -10,6 +10,7 @@ public class Vote {
     private Long id;
     private Integer answer; // 0="No", 1="Yes"
 
+    @Id
     public Long getId() {
         return id;
     }

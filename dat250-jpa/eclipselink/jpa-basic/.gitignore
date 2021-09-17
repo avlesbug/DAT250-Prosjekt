@@ -1,3 +1,4 @@
 /target/
 dat250-jpa/eclipselink/jpa-basic/src/main/resources/META-INF/persistence.xml
 dat250-jpa/eclipselink/jpa-basic/pom.xml
+dat250-jpa/eclipselink/jpa-basic/src/main/java/no/hvl/dat250/jpa/basicexample/Banking
