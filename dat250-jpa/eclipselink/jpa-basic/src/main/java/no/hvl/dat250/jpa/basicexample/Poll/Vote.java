@@ -10,13 +10,13 @@ public class Vote {
     private Long id;
     private Integer answer; // 0="No", 1="Yes"
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Id
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Integer getAnswer() {

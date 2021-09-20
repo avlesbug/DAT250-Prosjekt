@@ -34,33 +34,48 @@ public class PollMain {
 
             //Create user
             PollUser pollUser = new PollUser();
+            PollUser pollUser2 = new PollUser();
             pollUser.setName("Max Musterman");
+            pollUser2.setName("Ola Normann");
+            pollUser2.setEmail("ola.normann@gmail.com");
             pollUser.setEmail("m.musterman@gmail.com");
+            pollUser.setPassword("Password123");
+            pollUser2.setPassword("Spania2009");
 
             //Create poll & votes
 
             Poll poll = new Poll();
+            Poll poll2 = new Poll();
             List<Poll> pollList = new ArrayList<>();
             poll.setName("Simple poll");
             poll.setQuestion("Is this a question?");
-            //System.out.println(poll.getId());
+            poll.setUser(pollUser);
+            poll2.setName("Second poll");
+            poll2.setQuestion("Do you like taco?");
+            poll2.setUser(pollUser);
             pollList.add(poll);
+            pollList.add(poll2);
             pollUser.setPollList(pollList);
+
 
 
             List<Vote> votes = new ArrayList<>();
             Vote vote = new Vote();
             vote.setAnswer(1);
             Vote vote2 = new Vote();
-            vote.setAnswer(0);
+            vote2.setAnswer(0);
+            vote.setPoll(poll);
+            vote2.setPoll(poll);
             votes.add(vote);
             votes.add(vote2);
             poll.setVotes(votes);
 
             em.persist(pollUser);
             em.persist(poll);
+            em.persist(poll2);
             em.persist(vote);
             em.persist(vote2);
+            em.persist(pollUser2);
 
         }
 

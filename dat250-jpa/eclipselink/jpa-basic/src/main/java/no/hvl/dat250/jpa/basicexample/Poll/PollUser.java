@@ -14,18 +14,18 @@ public class PollUser {
         private String email;
         private String password;
 
+    public void setId(Long Id) { this.id = Id; }
+
     @Id
     public Long getId() {
         return id;
     }
 
-    public void setId(Long Id) { this.id = Id; }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String firstName) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -45,6 +45,7 @@ public class PollUser {
         this.password = password;
     }
 
+
     @OneToMany
     @JoinTable(name = "jnd_poll_pllusr",
             joinColumns = @JoinColumn(name = "polluser_fk"),
@@ -52,6 +53,16 @@ public class PollUser {
     private List<Poll> pollList = new ArrayList<Poll>();
     public List<Poll> getPollList() { return pollList; }
     public void setPollList(List<Poll> pollList) { this.pollList = pollList; }
+
+    /**
+    @OneToOne
+
+    private Poll poll;
+
+    public Poll getPoll() { return poll; }
+
+    public void setPoll(Poll poll) { this.poll = poll; }
+    **/
 }
 
 

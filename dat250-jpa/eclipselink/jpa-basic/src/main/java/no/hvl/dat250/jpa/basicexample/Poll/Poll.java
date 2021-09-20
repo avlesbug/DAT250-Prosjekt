@@ -13,13 +13,13 @@ public class Poll {
     private String name;
     private String question;
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Id
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -39,15 +39,15 @@ public class Poll {
     }
 
 
-    @ManyToOne
+    @OneToOne
     private PollUser pollUser;
     public PollUser getPollUser() { return pollUser; }
     public void setUser(PollUser pollUser) { this.pollUser = pollUser; }
 
-    @OneToMany
-    @JoinTable(name = "jnd_vote_poll",
-            joinColumns = @JoinColumn(name = "poll_fk"),
-            inverseJoinColumns = @JoinColumn(name = "vote_fk"))
+    @OneToMany(mappedBy = "poll")
+   // @JoinTable(name = "jnd_vote_poll",
+     //       joinColumns = @JoinColumn(name = "poll_fk"),
+       //     inverseJoinColumns = @JoinColumn(name = "vote_fk"))
     private List<Vote> votes = new ArrayList<>();
     public List<Vote> getVotes() { return votes; }
 
