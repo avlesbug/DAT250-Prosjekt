@@ -14,6 +14,18 @@ public class PollUser {
         private String email;
         private String password;
 
+        public PollUser(){
+            name = "Poll User";
+            email = "poll@user.com";
+            password = "Password";
+        }
+
+        public PollUser(String name, String email, String password){
+            this.name = name;
+            this.email = email;
+            this.password = password;
+        }
+
     public void setId(Long Id) { this.id = Id; }
 
     @Id
@@ -54,15 +66,6 @@ public class PollUser {
     public List<Poll> getPollList() { return pollList; }
     public void setPollList(List<Poll> pollList) { this.pollList = pollList; }
 
-    /**
-    @OneToOne
-
-    private Poll poll;
-
-    public Poll getPoll() { return poll; }
-
-    public void setPoll(Poll poll) { this.poll = poll; }
-    **/
 }
 
 

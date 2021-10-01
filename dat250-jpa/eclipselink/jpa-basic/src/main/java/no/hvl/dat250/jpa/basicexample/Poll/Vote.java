@@ -8,7 +8,16 @@ public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Integer answer; // 0="No", 1="Yes"
+    private Answer answer;
+
+    public Vote(){
+        answer = null;
+    }
+
+    public Vote(Answer answer, Poll poll){
+        this.answer = answer;
+        this.poll = poll;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -19,11 +28,11 @@ public class Vote {
         return id;
     }
 
-    public Integer getAnswer() {
+    public Answer getAnswer() {
         return answer;
     }
 
-    public void setAnswer(Integer answer) {
+    public void setAnswer(Answer answer) {
         this.answer = answer;
     }
 

@@ -21,6 +21,7 @@ public class PollMain {
         // Begin a new local transaction so that we can persist a new entity
         em.getTransaction().begin();
 
+
         // read the existing entries
         Query q = em.createQuery("select u from PollUser u");
         // Persons should be empty
@@ -32,51 +33,37 @@ public class PollMain {
         if (createNewEntries) {
             assertTrue(q.getResultList().size() == 0);
 
-            //Create user
-            PollUser pollUser = new PollUser();
-            PollUser pollUser2 = new PollUser();
-            pollUser.setName("Max Musterman");
-            pollUser2.setName("Ola Normann");
-            pollUser2.setEmail("ola.normann@gmail.com");
-            pollUser.setEmail("m.musterman@gmail.com");
-            pollUser.setPassword("Password123");
-            pollUser2.setPassword("Spania2009");
+            PollDAO pollDAO = new PollDAO();
+            pollDAO.setEmf(factory);
+            PollUserDAO pollUserDAO = new PollUserDAO();
+            pollUserDAO.setEmf(factory);
 
-            //Create poll & votes
 
-            Poll poll = new Poll();
-            Poll poll2 = new Poll();
+            PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
+            pollUserDAO.persistPollUser(pollUser);
+
             List<Poll> pollList = new ArrayList<>();
-            poll.setName("Simple poll");
-            poll.setQuestion("Is this a question?");
-            poll.setUser(pollUser);
-            poll2.setName("Second poll");
-            poll2.setQuestion("Do you like taco?");
-            poll2.setUser(pollUser);
+            Poll poll = new Poll("Poll name", "Poll question #1", pollUser);
+            //Poll poll2 = new Poll("Second poll", "Do you like polls?", pollUser);
             pollList.add(poll);
-            pollList.add(poll2);
             pollUser.setPollList(pollList);
 
 
 
-            List<Vote> votes = new ArrayList<>();
-            Vote vote = new Vote();
-            vote.setAnswer(1);
-            Vote vote2 = new Vote();
-            vote2.setAnswer(0);
-            vote.setPoll(poll);
-            vote2.setPoll(poll);
-            votes.add(vote);
-            votes.add(vote2);
-            poll.setVotes(votes);
 
-            em.persist(pollUser);
-            em.persist(poll);
-            em.persist(poll2);
-            em.persist(vote);
-            em.persist(vote2);
-            em.persist(pollUser2);
+            List<Vote> newVotes = new ArrayList<>();
+            for(int i=0; i<20;i++){
+                Vote newVote;
+                if(i%2==1){
+                    newVote = new Vote(Answer.YES,poll);
+                } else {
+                    newVote = new Vote(Answer.NO,poll);
+                }
+                newVotes.add(newVote);
+            }
+            poll.setVotes(newVotes);
 
+            pollDAO.persistPoll(poll);
         }
 
         // Commit the transaction, which will cause the entity to
@@ -91,4 +78,56 @@ public class PollMain {
 
     }
 }
+
+/**
+ * Gammel Main
+ * if (createNewEntries) {
+ *             assertTrue(q.getResultList().size() == 0);
+ *
+ *             //Create user
+ *             PollUser pollUser = new PollUser();
+ *             PollUser pollUser2 = new PollUser();
+ *             pollUser.setName("Max Musterman");
+ *             pollUser2.setName("Ola Normann");
+ *             pollUser2.setEmail("ola.normann@gmail.com");
+ *             pollUser.setEmail("m.musterman@gmail.com");
+ *             pollUser.setPassword("Password123");
+ *             pollUser2.setPassword("Spania2009");
+ *
+ *             //Create poll & votes
+ *
+ *             Poll poll = new Poll();
+ *             Poll poll2 = new Poll();
+ *             List<Poll> pollList = new ArrayList<>();
+ *             poll.setName("Simple poll");
+ *             poll.setQuestion("Is this a question?");
+ *             poll.setUser(pollUser);
+ *             poll2.setName("Second poll");
+ *             poll2.setQuestion("Do you like taco?");
+ *             poll2.setUser(pollUser);
+ *             pollList.add(poll);
+ *             pollList.add(poll2);
+ *             pollUser.setPollList(pollList);
+ *
+ *
+ *
+ *             List<Vote> votes = new ArrayList<>();
+ *             Vote vote = new Vote();
+ *             vote.setAnswer(1);
+ *             Vote vote2 = new Vote();
+ *             vote2.setAnswer(0);
+ *             vote.setPoll(poll);
+ *             vote2.setPoll(poll);
+ *             votes.add(vote);
+ *             votes.add(vote2);
+ *             poll.setVotes(votes);
+ *
+ *             em.persist(pollUser);
+ *             em.persist(poll);
+ *             em.persist(poll2);
+ *             em.persist(vote);
+ *             em.persist(vote2);
+ *             em.persist(pollUser2);
+ *
+ */
 

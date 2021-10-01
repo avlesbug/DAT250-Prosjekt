@@ -13,6 +13,17 @@ public class Poll {
     private String name;
     private String question;
 
+    public Poll(){
+        name = "Unnamed poll";
+        question = "undefined question";
+    }
+
+    public Poll(String name, String question, PollUser pollUser){
+        this.name = name;
+        this.question = question;
+        this.pollUser = pollUser;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -52,4 +63,8 @@ public class Poll {
     public List<Vote> getVotes() { return votes; }
 
     public void setVotes(List<Vote> votes) { this.votes = votes; }
+
+    public void addVote(Vote vote){
+        votes.add(vote);
+    }
 }
