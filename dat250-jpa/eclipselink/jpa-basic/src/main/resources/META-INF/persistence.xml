@@ -10,7 +10,7 @@
             <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
                       <!-- TODO Change the path in the value of the property "javax.persistence.jdbc.url" here! -->
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:derby:C:\Users\krist\dat250-jpa\testdb;create=true"/>
+                      value="jdbc:derby:C:\Users\krist\IdeaProjects\DAT250-Prosjekt\dat250-jpa\testdb;create=true"/>
             <property name="javax.persistence.jdbc.user" value="test"/>
             <property name="javax.persistence.jdbc.password" value="test"/>
 

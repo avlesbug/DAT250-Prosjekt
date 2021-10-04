@@ -1,5 +1,7 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
+import com.google.gson.Gson;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,14 @@ public class PollUser {
     private List<Poll> pollList = new ArrayList<Poll>();
     public List<Poll> getPollList() { return pollList; }
     public void setPollList(List<Poll> pollList) { this.pollList = pollList; }
+
+    String toJson() {
+        Gson gson = new Gson();
+
+        String jsonInString = gson.toJson(this);
+
+        return jsonInString;
+    }
 
 }
 
