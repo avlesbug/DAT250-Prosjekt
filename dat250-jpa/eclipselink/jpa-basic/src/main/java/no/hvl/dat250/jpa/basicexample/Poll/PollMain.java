@@ -76,6 +76,7 @@ public class PollMain {
 
 
         em.getTransaction().commit();
+        em.close();
 
         Long pollId = poll.getId();
         Long pollId2 = poll2.getId();
@@ -148,6 +149,8 @@ public class PollMain {
         after((req, res) -> {
             res.type("application/json");
         });
+
+        EntityManager ema = factory.createEntityManager();;
 
         //Get
 
@@ -227,7 +230,6 @@ public class PollMain {
         put("/polls/:id", (req, res) -> {
 
             Gson gson = new Gson();
-            em.getTransaction().begin();
 
             Poll tempPoll = gson.fromJson(req.body(), Poll.class);
 
@@ -235,9 +237,10 @@ public class PollMain {
 
             pollMap.put(id, tempPoll);
 
-            em.persist(tempPoll);
-            em.persist(tempPoll.getPollUser());
-            em.getTransaction().commit();
+            ema.getTransaction().begin();
+            ema.persist(tempPoll);
+            ema.merge(tempPoll.getPollUser());
+            ema.getTransaction().commit();
 
             return pollMap.get(id).toJson();
 
@@ -245,7 +248,6 @@ public class PollMain {
 
         put("/users/:id", (req, res) -> {
             Gson gson = new Gson();
-            em.getTransaction().begin();
 
             PollUser user = gson.fromJson(req.body(), PollUser.class);
 
@@ -257,8 +259,9 @@ public class PollMain {
 
             userMap.put(id,user);
 
-            em.merge(user);
-            em.getTransaction().commit();
+            ema.getTransaction().begin();
+            ema.merge(user);
+            ema.getTransaction().commit();
 
 
             return user.toJson();
@@ -287,13 +290,13 @@ public class PollMain {
 
         post("/polls", (req, res) -> {
             Gson gson = new Gson();
-            em.getTransaction().begin();
 
             Poll tempPoll = gson.fromJson(req.body(), Poll.class);
 
-            em.persist(tempPoll);
-            em.persist(tempPoll.getPollUser());
-            em.getTransaction().commit();
+            ema.getTransaction().begin();
+            ema.persist(tempPoll);
+            ema.merge(tempPoll.getPollUser());
+            ema.getTransaction().commit();
 
             Long id = tempPoll.getId();
 
@@ -305,12 +308,12 @@ public class PollMain {
 
         post("/users", (req, res) -> {
             Gson gson = new Gson();
-            em.getTransaction().begin();
 
             PollUser user = gson.fromJson(req.body(), PollUser.class);
 
-            em.persist(user);
-            em.getTransaction().commit();
+            ema.getTransaction().begin();
+            ema.persist(user);
+            ema.getTransaction().commit();
 
             Long id = user.getId();
 
@@ -369,6 +372,9 @@ public class PollMain {
         });
 
 
+        System.out.println("Ran main");
+
+        em.close();
     }
 
 }
