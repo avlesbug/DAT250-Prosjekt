@@ -335,6 +335,12 @@ public class PollMain {
             return gson.toJson(voteMap);
         });
 
+        delete("/votes", (req, res) -> {
+            Gson gson = new Gson();
+            voteMap = new HashMap<>();
+            return gson.toJson(voteMap);
+        });
+
         delete("/polls/:id", (req, res) -> {
             Gson gson = new Gson();
 
