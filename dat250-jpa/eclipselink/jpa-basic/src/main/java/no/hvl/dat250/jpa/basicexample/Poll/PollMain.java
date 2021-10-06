@@ -37,6 +37,7 @@ public class PollMain {
         // do we have entries?
         boolean createNewEntries = (q.getResultList().size() == 0);
 
+        /**
         PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
         PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", "Passord123");
 
@@ -51,6 +52,7 @@ public class PollMain {
         pollUser.addPoll(poll);
         pollUser.addPoll(poll2);
         System.out.println(pollUser.getPollList());
+
 
 
         em.getTransaction().begin();
@@ -89,13 +91,6 @@ public class PollMain {
         Long voteId = vote.getId();
         Long voteId2 = vote2.getId();
 
-
-        if (args.length > 0) {
-            port(Integer.parseInt(args[0]));
-        } else {
-            port(8080);
-        }
-
         pollMap.put(pollId, poll);
         userMap.put(userId, pollUser);
         pollMap.put(pollId2, poll2);
@@ -103,6 +98,12 @@ public class PollMain {
         voteMap.put(voteId,vote);
         voteMap.put(voteId2,vote2);
 
+       **/
+        if(args.length > 0 ){
+            port(Integer.parseInt(args[0]));
+        } else {
+            port(8080);
+        }
 
         after((req, res) -> {
             res.type("application/json");
@@ -119,7 +120,9 @@ public class PollMain {
                 string.append(p.toJson());
                 string.append(',');
             }
-            string.deleteCharAt(string.length()-1);
+            if(string.length()>1) {
+                string.deleteCharAt(string.length() - 1);
+            }
             return gson.toJson(string);
         });
 
@@ -130,7 +133,9 @@ public class PollMain {
                 string.append(u.toJson());
                 string.append(',');
             }
-            string.deleteCharAt(string.length()-1);
+            if(string.length()>1) {
+                string.deleteCharAt(string.length() - 1);
+            }
             return gson.toJson(string);
         });
 
@@ -231,7 +236,7 @@ public class PollMain {
 
         post("/votes", (req, res) -> {
             Gson gson = new Gson();
-            em.getTrnsaction().begin();
+            em.getTransaction().begin();
 
             Vote vote = gson.fromJson(req.body(), Vote.class);
 
@@ -262,6 +267,7 @@ public class PollMain {
             Long id = tempPoll.getId();
 
             pollMap.put(id, tempPoll);
+            System.out.println(pollMap.size());
 
             return tempPoll.toJson();
 
@@ -289,7 +295,9 @@ public class PollMain {
         delete("/votes/:id", (req, res) -> {
             Gson gson = new Gson();
 
-            Long id = Long parseLong(req.params("id"));
+            Long id = Long.parseLong(req.params("id"));
+
+
 
             voteMap.remove(id);
 
@@ -306,6 +314,7 @@ public class PollMain {
             Gson gson = new Gson();
 
             Long id = Long.parseLong(req.params("id"));
+
 
             pollMap.remove(id);
 
