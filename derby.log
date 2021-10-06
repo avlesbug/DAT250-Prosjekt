@@ -1,13 +1,13 @@
 ----------------------------------------------------------------
-Tue Oct 05 17:18:41 CEST 2021:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585): instance a816c00e-017c-5109-10df-0000079768d0 
-on database directory C:\Users\krist\IdeaProjects\DAT250-Prosjekt\dat250-jpa\testdb with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@368239c8 
-Loaded from file:/C:/Users/krist/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar
-java.vendor=JetBrains s.r.o.
-java.runtime.version=11.0.9+11-b944.49
-user.dir=C:\Users\krist\IdeaProjects\DAT250-Prosjekt
-os.name=Windows 10
-os.arch=amd64
-os.version=10.0
+Wed Oct 06 13:27:02 CEST 2021:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.15.2.0 - (1873585): instance a816c00e-017c-555b-5945-00000f817750 
+on database directory /Users/theodornk/Documents/Master/DAT250/DAT250-Prosjekt/projectDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@2c13da15 
+Loaded from file:/Users/theodornk/.m2/repository/org/apache/derby/derby/10.15.2.0/derby-10.15.2.0.jar
+java.vendor=Eclipse Foundation
+java.runtime.version=11.0.12+7
+user.dir=/Users/theodornk/Documents/Master/DAT250/DAT250-Prosjekt
+os.name=Mac OS X
+os.arch=x86_64
+os.version=11.4
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''

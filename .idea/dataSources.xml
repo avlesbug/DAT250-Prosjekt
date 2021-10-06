@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="testdb" uuid="3338ab61-ddf7-4527-a60b-0714cf51274c">
+    <data-source source="LOCAL" name="projectDB" uuid="9fcf224d-7e25-4c58-b3da-c177672896a5">
       <driver-ref>derby.embedded</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.apache.derby.jdbc.EmbeddedDriver</jdbc-driver>
-      <jdbc-url>jdbc:derby:$PROJECT_DIR$/dat250-jpa/testdb</jdbc-url>
+      <jdbc-url>jdbc:derby:$PROJECT_DIR$/projectDB</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
 </project>
