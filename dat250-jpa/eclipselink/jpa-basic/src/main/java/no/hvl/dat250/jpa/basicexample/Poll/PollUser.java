@@ -82,7 +82,7 @@ public class PollUser {
     public String simpleToJson() {
         Gson gson = new Gson();
 
-        String jsonInString = gson.toJson("test");
+        String jsonInString = gson.toJson(this);
 
         return jsonInString;
     }
