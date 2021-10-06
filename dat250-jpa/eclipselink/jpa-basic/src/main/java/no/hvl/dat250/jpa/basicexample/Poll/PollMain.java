@@ -206,6 +206,23 @@ public class PollMain {
             return voteMap.get(id).toJson();
         });
         //Put
+        put("/votes/:id", (req, res) -> {
+
+            Gson gson = new Gson();
+            em.getTransaction().begin();
+
+            Vote vote = gson.fromJson(req.body(), Vote.class);
+
+            Long id = Long.parseLong(req.params("id"));
+
+            voteMap.put(id, vote);
+
+            em.persist(vote);
+            em.merge(vote);
+            em.getTransaction().commit();
+
+            return voteMap.get(id).toJson();
+        });
 
         put("/polls/:id", (req, res) -> {
 
@@ -251,6 +268,23 @@ public class PollMain {
 
         //Post
 
+        post("/votes", (req, res) -> {
+            Gson gson = new Gson();
+            em.getTrnsaction().begin();
+
+            Vote vote = gson.fromJson(req.body(), Vote.class);
+
+            em.persist(vote);
+            em.getTransaction().commit();
+
+            Long id = vote.getId();
+
+            voteMap.put(id, vote);
+
+            return vote.toJson();
+
+        });
+
         post("/polls", (req, res) -> {
             Gson gson = new Gson();
             em.getTransaction().begin();
@@ -287,6 +321,16 @@ public class PollMain {
         });
 
         //Delete
+
+        delete("/votes/:id", (req, res) -> {
+            Gson gson = new Gson();
+
+            Long id = Long parseLong(req.params("id"));
+
+            voteMap.remove(id);
+
+            return gson.toJson(voteMap);
+        });
 
         delete("/polls/:id", (req, res) -> {
             Gson gson = new Gson();
