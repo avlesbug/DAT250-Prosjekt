@@ -49,6 +49,8 @@ public class PollMain {
         //poll.addVote(vote);
         //poll2.addVote(vote2);
         pollUser.addPoll(poll);
+        pollUser.addPoll(poll2);
+        System.out.println(pollUser.getPollList());
 
 
         em.getTransaction().begin();
@@ -87,7 +89,6 @@ public class PollMain {
         Long voteId = vote.getId();
         Long voteId2 = vote2.getId();
 
-        System.out.println(pollId + " + " + userId);
 
 
         // No, so lets create new entries
@@ -143,8 +144,6 @@ public class PollMain {
         voteMap.put(voteId,vote);
         voteMap.put(voteId2,vote2);
 
-        System.out.println(pollMap);
-        System.out.println(userMap);
 
         after((req, res) -> {
             res.type("application/json");
@@ -262,6 +261,9 @@ public class PollMain {
             ema.getTransaction().begin();
             ema.persist(tempPoll);
             ema.merge(tempPoll.getPollUser());
+            System.out.println(tempPoll.getPollUser().getPollList());
+            tempPoll.getPollUser().addPoll(tempPoll);
+            System.out.println(tempPoll.getPollUser().getPollList());
             ema.getTransaction().commit();
 
             Long id = tempPoll.getId();
@@ -327,10 +329,6 @@ public class PollMain {
 
         });
 
-
-        System.out.println("Ran main");
-
-        em.close();
     }
 
 }
