@@ -13,7 +13,7 @@ public class GetRequest {
 		OkHttpClient client = new OkHttpClient();
 
 		Request request = new Request.Builder()
-		  .url("http://localhost:8080/counters")
+		  .url("http://localhost:8080/polls")
 		  .get()
 		  .build();
 

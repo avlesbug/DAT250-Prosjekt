@@ -11,16 +11,17 @@ public class TCPPutRequest {
 
 	private static int port = 8080;
 	private static String host = "localhost";
-	private static String uri = "/users/:id";
+	private static String uri = "/polls/:id";
 
 	public static void main(String[] args) {
 
-		PollUser pollUser = new PollUser("Ola Normann", "Ola@gmail.com", "passord123");
+		Poll poll = new Poll();
+
 
 		try (Socket s = new Socket(host, port)) {
 
 			// construct the HTTP request
-			String jsonbody = pollUser.toJson();
+			String jsonbody = poll.toJson();
 
 			String httpputrequest = 
 					"PUT " + uri + " HTTP/1.1\r\n" + 

@@ -1,5 +1,7 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
+import com.google.gson.Gson;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,8 @@ public class Poll {
     public Poll(){
         name = "Unnamed poll";
         question = "undefined question";
+        Vote vote = new Vote(Answer.NO, this);
+        //addVote(vote);
     }
 
     public Poll(String name, String question, PollUser pollUser){
@@ -67,4 +71,37 @@ public class Poll {
     public void addVote(Vote vote){
         votes.add(vote);
     }
+
+    public int getYesVotes(){
+        int yes = 0;
+        for(Vote v : getVotes()){
+            if(v.getAnswer() == Answer.YES){
+                yes++;
+            }
+        }
+
+        return yes;
+    }
+
+    public int getNoVotes(){
+        int no = 0;
+        for(Vote v : getVotes()){
+            if(v.getAnswer() == Answer.NO){
+                no++;
+            }
+        }
+
+        return no;
+    }
+
+    String toJson() {
+        Gson gson = new Gson();
+
+        StringBuilder votes = new StringBuilder();
+
+        String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", pollUserId: " + pollUser.getId() + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
+
+        return jsonInString;
+    }
+
 }

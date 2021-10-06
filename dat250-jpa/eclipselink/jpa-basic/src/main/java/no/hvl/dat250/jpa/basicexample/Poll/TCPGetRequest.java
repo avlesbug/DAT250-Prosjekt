@@ -11,7 +11,7 @@ public class TCPGetRequest {
 
     private static int port = 8080;
     private static String host = "localhost";
-    private static String uri = "/users";
+    private static String uri = "/polls";
 
     public static void main(String[] args) {
 
