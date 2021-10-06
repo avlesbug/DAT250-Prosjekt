@@ -368,7 +368,9 @@ public class PollMain {
                 string.append(p.toJson());
                 string.append(',');
             }
-            string.deleteCharAt(string.length()-1);
+            if(string.length()>1){
+                string.deleteCharAt(string.length()-1);
+            }
             return gson.toJson(string);
 
         });
