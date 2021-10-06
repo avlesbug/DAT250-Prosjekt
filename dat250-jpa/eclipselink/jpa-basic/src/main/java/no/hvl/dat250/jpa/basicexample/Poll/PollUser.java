@@ -23,6 +23,7 @@ public class PollUser {
             name = "Poll User";
             email = "poll@user.com";
             password = "Password";
+            pollList = this.getPollList();
         }
 
         public PollUser(String name, String email, String password){
