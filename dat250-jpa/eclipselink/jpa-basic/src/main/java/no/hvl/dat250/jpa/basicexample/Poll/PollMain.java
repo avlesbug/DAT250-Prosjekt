@@ -37,101 +37,92 @@ public class PollMain {
         // do we have entries?
         boolean createNewEntries = (q.getResultList().size() == 0);
 
-        /**
-        PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
-        PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", "Passord123");
-
-        Poll poll = new Poll("My first poll","Can you attend my birthday party?", pollUser);
-        Poll poll2 = new Poll("My second poll","Can you host my birthday party?", pollUser2);
-
-        //Vote vote = new Vote(Answer.NO, poll);
-        Vote vote2 = new Vote(Answer.YES, poll2);
-
-        //poll.addVote(vote);
-        //poll2.addVote(vote2);
-        pollUser.addPoll(poll);
-        pollUser.addPoll(poll2);
-        System.out.println(pollUser.getPollList());
 
 
-
-        em.getTransaction().begin();
-
-        em.persist(pollUser);
-        em.persist(poll);
-        em.persist(pollUser2);
-        em.persist(poll2);
-        em.persist(vote);
-        em.persist(vote2);
-
-        List<Vote> newVotes = new ArrayList<>();
-        for(int i=0; i<20;i++){
-            Vote newVote;
-            if(i%2==1){
-                newVote = new Vote(Answer.YES,poll);
-            } else {
-                newVote = new Vote(Answer.NO,poll);
-            }
-            em.persist(newVote);
-            newVotes.add(newVote);
-            voteMap.put(newVote.getId(),newVote);
-        }
-        poll.setVotes(newVotes);
-
-
-       em.getTransaction().commit();
-        em.close();
-
-        Long pollId = poll.getId();
-        Long pollId2 = poll2.getId();
-
-        Long userId = pollUser.getId();
-        Long userId2 = pollUser2.getId();
-
-        Long voteId = vote.getId();
-        Long voteId2 = vote2.getId();
-
-        System.out.println(pollId + " + " + userId);
-
-
-        // No, so lets create new entries
-
-        /**
         if (createNewEntries) {
-            assertTrue(q.getResultList().size() == 0);
+            PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
+            PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", "Passord123");
 
-            PollDAO pollDAO = new PollDAO();
-            pollDAO.setEmf(factory);
-            PollUserDAO pollUserDAO = new PollUserDAO();
-            pollUserDAO.setEmf(factory);
+            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, pollUser);
+            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, pollUser2);
 
+            Vote vote = new Vote(Answer.NO, poll);
+            Vote vote2 = new Vote(Answer.YES, poll2);
 
-            pollUserDAO.persistPollUser(pollUser);
-
-            List<Poll> pollList = new ArrayList<>();
-            //Poll poll2 = new Poll("Poll name", "Poll question #1", pollUser);
-            //Poll poll2 = new Poll("Second poll", "Do you like polls?", pollUser);
-            pollList.add(poll);
-            pollUser.setPollList(pollList);
+            poll.addVote(vote);
+            poll2.addVote(vote2);
+            pollUser.addPoll(poll);
+            pollUser.addPoll(poll2);
 
 
+            em.getTransaction().begin();
 
+            em.persist(pollUser);
+            em.persist(poll);
+            em.persist(pollUser2);
+            em.persist(poll2);
+            em.persist(vote);
+            em.persist(vote2);
 
             List<Vote> newVotes = new ArrayList<>();
-            for(int i=0; i<20;i++){
+            for (int i = 0; i < 20; i++) {
                 Vote newVote;
-                if(i%2==1){
-                    newVote = new Vote(Answer.YES,poll);
+                if (i % 2 == 1) {
+                    newVote = new Vote(Answer.YES, poll);
                 } else {
-                    newVote = new Vote(Answer.NO,poll);
+                    newVote = new Vote(Answer.NO, poll);
                 }
+                em.persist(newVote);
                 newVotes.add(newVote);
+                voteMap.put(newVote.getId(), newVote);
             }
             poll.setVotes(newVotes);
 
-            pollDAO.persistPoll(poll);
+            em.getTransaction().commit();
+            em.close();
+
+            Long pollId = poll.getId();
+            Long pollId2 = poll2.getId();
+
+            Long userId = pollUser.getId();
+            Long userId2 = pollUser2.getId();
+
+            Long voteId = vote.getId();
+            Long voteId2 = vote2.getId();
+
+
+            pollMap.put(pollId, poll);
+            userMap.put(userId, pollUser);
+            pollMap.put(pollId2, poll2);
+            userMap.put(userId2, pollUser2);
+            voteMap.put(voteId, vote);
+            voteMap.put(voteId2, vote2);
+        } else{
+            //Add entities in jpa db to hashmaps
+
+            //Users
+            List<PollUser> users = q.getResultList();
+            for (PollUser u : users){
+                userMap.put(u.getId(),u);
+            }
+
+            Query qp = em.createQuery("select p from Poll p");
+
+            //Polls
+            List<Poll> polls = qp.getResultList();
+            for (Poll p : polls){
+                pollMap.put(p.getId(),p);
+            }
+
+            Query qv = em.createQuery("select v from Vote v");
+
+            //Polls
+            List<Vote> votes = qv.getResultList();
+            for (Vote v : votes){
+                voteMap.put(v.getId(),v);
+            }
+
         }
-         **/
 
 
         if (args.length > 0) {
@@ -139,16 +130,6 @@ public class PollMain {
         } else {
             port(8080);
         }
-
-       /* pollMap.put(pollId, poll);
-        userMap.put(userId, pollUser);
-        pollMap.put(pollId2, poll2);
-        userMap.put(userId2, pollUser2);
-        voteMap.put(voteId,vote);
-        voteMap.put(voteId2,vote2);*/
-
-        System.out.println(pollMap);
-        System.out.println(userMap);
 
         after((req, res) -> {
             res.type("application/json");
@@ -171,6 +152,13 @@ public class PollMain {
             return gson.toJson(string);
         });
 
+        get("/polls/:id", (req, res) -> {
+            Gson gson = new Gson();
+            Long id = Long.parseLong(req.params("id"));
+
+            return pollMap.get(id).toJson();
+        });
+
         get("/users", (req, res) -> {
             Gson gson = new Gson();
             StringBuilder string = new StringBuilder();
@@ -184,6 +172,13 @@ public class PollMain {
             return gson.toJson(string);
         });
 
+        get("/users/:id", (req, res) -> {
+            Gson gson = new Gson();
+            Long id = Long.parseLong(req.params("id"));
+            //return gson.toJson(userMap.get(id));
+            return userMap.get(id).toJson();
+        });
+
         get("/votes", (req, res) -> {
             Gson gson = new Gson();
             StringBuilder string = new StringBuilder();
@@ -191,23 +186,11 @@ public class PollMain {
                 string.append(v.toJson());
                 string.append(',');
             }
-            string.deleteCharAt(string.length()-1);
+            if(string.length()>1){
+                string.deleteCharAt(string.length()-1);
+            }
             return gson.toJson(string);
             //return voteMap.get(voteId).toJson();
-        });
-
-        get("/users/:id", (req, res) -> {
-            Gson gson = new Gson();
-            Long id = Long.parseLong(req.params("id"));
-            //return gson.toJson(userMap.get(id));
-            return userMap.get(id).simpleToJson();
-        });
-
-        get("/polls/:id", (req, res) -> {
-            Gson gson = new Gson();
-            Long id = Long.parseLong(req.params("id"));
-
-            return pollMap.get(id).toJson();
         });
 
         get("/votes/:id", (req, res) -> {
@@ -217,24 +200,6 @@ public class PollMain {
             return voteMap.get(id).toJson();
         });
         //Put
-        put("/votes/:id", (req, res) -> {
-
-            Gson gson = new Gson();
-            em.getTransaction().begin();
-
-            Vote vote = gson.fromJson(req.body(), Vote.class);
-
-            Long id = Long.parseLong(req.params("id"));
-
-            voteMap.put(id, vote);
-
-            em.persist(vote);
-            em.merge(vote);
-            em.getTransaction().commit();
-
-            return voteMap.get(id).toJson();
-        });
-
         put("/polls/:id", (req, res) -> {
 
             Gson gson = new Gson();
@@ -263,8 +228,6 @@ public class PollMain {
 
             user.setId(id);
 
-            //userMap.remove(id);
-
             userMap.put(id,user);
 
             ema.getTransaction().begin();
@@ -276,26 +239,26 @@ public class PollMain {
 
         });
 
+        put("/votes/:id", (req, res) -> {
 
-        //Post
-
-        post("/votes", (req, res) -> {
             Gson gson = new Gson();
             em.getTransaction().begin();
 
-            Vote vote = gson.fromJson(req.body(), Vote.class);
+            Vote tempVote = gson.fromJson(req.body(), Vote.class);
 
-            em.persist(vote);
+            Long id = Long.parseLong(req.params("id"));
+
+            voteMap.put(id, tempVote);
+
+            em.persist(tempVote);
+            em.merge(tempVote);
             em.getTransaction().commit();
 
-            Long id = vote.getId();
-
-            voteMap.put(id, vote);
-
-            return vote.toJson();
-
+            return voteMap.get(id).toJson();
         });
 
+
+        //Post
         post("/polls", (req, res) -> {
             Gson gson = new Gson();
 
@@ -304,9 +267,7 @@ public class PollMain {
             ema.getTransaction().begin();
             ema.persist(tempPoll);
             ema.merge(tempPoll.getPollUser());
-            System.out.println(tempPoll.getPollUser().getPollList());
             tempPoll.getPollUser().addPoll(tempPoll);
-            System.out.println(tempPoll.getPollUser().getPollList());
             ema.getTransaction().commit();
 
             Long id = tempPoll.getId();
@@ -334,25 +295,24 @@ public class PollMain {
             return user.toJson();
         });
 
+        post("/votes", (req, res) -> {
+            Gson gson = new Gson();
+            em.getTransaction().begin();
+
+            Vote tempVote = gson.fromJson(req.body(), Vote.class);
+
+            em.persist(tempVote);
+            em.getTransaction().commit();
+
+            Long id = tempVote.getId();
+
+            voteMap.put(id, tempVote);
+
+            return tempVote.toJson();
+
+        });
+
         //Delete
-
-        delete("/votes/:id", (req, res) -> {
-            Gson gson = new Gson();
-
-            Long id = Long.parseLong(req.params("id"));
-
-
-
-            voteMap.remove(id);
-
-            return gson.toJson(voteMap);
-        });
-
-        delete("/votes", (req, res) -> {
-            Gson gson = new Gson();
-            voteMap = new HashMap<>();
-            return gson.toJson(voteMap);
-        });
 
         delete("/polls/:id", (req, res) -> {
             Gson gson = new Gson();
@@ -402,64 +362,25 @@ public class PollMain {
 
         });
 
+        delete("/votes/:id", (req, res) -> {
+            Gson gson = new Gson();
 
-        System.out.println("Ran main");
+            Long id = Long.parseLong(req.params("id"));
 
-        em.close();
+
+
+            voteMap.remove(id);
+
+            return gson.toJson(voteMap);
+        });
+
+        delete("/votes", (req, res) -> {
+            Gson gson = new Gson();
+            voteMap = new HashMap<>();
+            return gson.toJson(voteMap);
+        });
+
     }
 
 }
-
-
-/**
- * Gammel Main
- * if (createNewEntries) {
- *             assertTrue(q.getResultList().size() == 0);
- *
- *             //Create user
- *             PollUser pollUser = new PollUser();
- *             PollUser pollUser2 = new PollUser();
- *             pollUser.setName("Max Musterman");
- *             pollUser2.setName("Ola Normann");
- *             pollUser2.setEmail("ola.normann@gmail.com");
- *             pollUser.setEmail("m.musterman@gmail.com");
- *             pollUser.setPassword("Password123");
- *             pollUser2.setPassword("Spania2009");
- *
- *             //Create poll & votes
- *
- *             Poll poll = new Poll();
- *             Poll poll2 = new Poll();
- *             List<Poll> pollList = new ArrayList<>();
- *             poll.setName("Simple poll");
- *             poll.setQuestion("Is this a question?");
- *             poll.setUser(pollUser);
- *             poll2.setName("Second poll");
- *             poll2.setQuestion("Do you like taco?");
- *             poll2.setUser(pollUser);
- *             pollList.add(poll);
- *             pollList.add(poll2);
- *             pollUser.setPollList(pollList);
- *
- *
- *
- *             List<Vote> votes = new ArrayList<>();
- *             Vote vote = new Vote();
- *             vote.setAnswer(1);
- *             Vote vote2 = new Vote();
- *             vote2.setAnswer(0);
- *             vote.setPoll(poll);
- *             vote2.setPoll(poll);
- *             votes.add(vote);
- *             votes.add(vote2);
- *             poll.setVotes(votes);
- *
- *             em.persist(pollUser);
- *             em.persist(poll);
- *             em.persist(poll2);
- *             em.persist(vote);
- *             em.persist(vote2);
- *             em.persist(pollUser2);
- *
- */
 

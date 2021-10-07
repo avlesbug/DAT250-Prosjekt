@@ -14,18 +14,19 @@ public class Poll {
     private Long id;
     private String name;
     private String question;
+    private boolean isPrivate;
 
     public Poll(){
         name = "Unnamed poll";
         question = "undefined question";
-        Vote vote = new Vote(Answer.NO, this);
-        //addVote(vote);
+        isPrivate = false;
     }
 
-    public Poll(String name, String question, PollUser pollUser){
+    public Poll(String name, String question,boolean isPrivate, PollUser pollUser){
         this.name = name;
         this.question = question;
         this.pollUser = pollUser;
+        this.isPrivate = isPrivate;
     }
 
     public void setId(Long id) {
@@ -51,6 +52,15 @@ public class Poll {
 
     public void setQuestion(String question) {
         this.question = question;
+    }
+
+
+    public boolean getPrivacy() {
+        return isPrivate;
+    }
+
+    public void setPrivacy(boolean isPrivate){
+        this.isPrivate = isPrivate;
     }
 
 
@@ -99,7 +109,17 @@ public class Poll {
 
         StringBuilder votes = new StringBuilder();
 
-        String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", pollUserId: " + pollUser.getId() + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
+        String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", isPrivate: " + isPrivate + ", pollUserId: " + pollUser.getId() + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
+
+        return jsonInString;
+    }
+
+    String simpleToJson() {
+        Gson gson = new Gson();
+
+        StringBuilder votes = new StringBuilder();
+
+        String jsonInString = gson.toJson(this);
 
         return jsonInString;
     }
