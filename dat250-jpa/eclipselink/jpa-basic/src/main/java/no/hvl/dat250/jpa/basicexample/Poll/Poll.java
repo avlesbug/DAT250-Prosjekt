@@ -14,6 +14,7 @@ public class Poll {
     private Long id;
     private String name;
     private String question;
+    private Long pollUserId;
     private boolean isPrivate;
 
     public Poll(){
@@ -22,11 +23,13 @@ public class Poll {
         isPrivate = false;
     }
 
-    public Poll(String name, String question,boolean isPrivate, PollUser pollUser){
+    public Poll(String name, String question,boolean isPrivate, Long pollUserId){
+
         this.name = name;
         this.question = question;
-        this.pollUser = pollUser;
         this.isPrivate = isPrivate;
+        this.pollUserId = pollUserId;
+
     }
 
     public void setId(Long id) {
@@ -54,6 +57,13 @@ public class Poll {
         this.question = question;
     }
 
+    public Long getPollUserId(){
+        return pollUserId;
+    }
+
+    public void setPollUserId(Long pollUserId) {
+        this.pollUserId = pollUserId;
+    }
 
     public boolean getPrivacy() {
         return isPrivate;
@@ -67,12 +77,12 @@ public class Poll {
     @OneToOne
     private PollUser pollUser;
     public PollUser getPollUser() { return pollUser; }
-    public void setUser(PollUser pollUser) { this.pollUser = pollUser; }
+    public void setPollUser(PollUser pollUser) { this.pollUser = pollUser; }
 
     @OneToMany(mappedBy = "poll")
-   // @JoinTable(name = "jnd_vote_poll",
-     //       joinColumns = @JoinColumn(name = "poll_fk"),
-       //     inverseJoinColumns = @JoinColumn(name = "vote_fk"))
+    @JoinTable(name = "jnd_vote_poll",
+            joinColumns = @JoinColumn(name = "poll_fk"),
+            inverseJoinColumns = @JoinColumn(name = "vote_fk"))
     private List<Vote> votes = new ArrayList<>();
     public List<Vote> getVotes() { return votes; }
 
@@ -109,8 +119,9 @@ public class Poll {
 
         StringBuilder votes = new StringBuilder();
 
-        String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", isPrivate: " + isPrivate + ", pollUserId: " + pollUser.getId() + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
+        String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", isPrivate: " + isPrivate + ", pollUserId: " + pollUserId + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
 
+        System.out.println(pollUser);
         return jsonInString;
     }
 

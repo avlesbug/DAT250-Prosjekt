@@ -21,7 +21,9 @@ public class PollMain {
     private static EntityManagerFactory factory;
     static HashMap<Long, Poll> pollMap = new HashMap<>();
     static HashMap<Long, PollUser> userMap = new HashMap<>();
-    static  HashMap<Long, Vote> voteMap = new HashMap<>();
+    static HashMap<Long, Vote> voteMap = new HashMap<>();
+
+
 
     public static void main(String[] args) {
 
@@ -43,23 +45,35 @@ public class PollMain {
             PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
             PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", "Passord123");
 
-            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, pollUser);
-            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, pollUser2);
+            em.persist(pollUser);
+            em.persist(pollUser2);
+
+
+            Long userId = pollUser.getId();
+            Long userId2 = pollUser2.getId();
+
+            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId);
+            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2);
+
+            poll.setPollUser(em.find(PollUser.class, userId));
+            poll2.setPollUser(em.find(PollUser.class, userId2));
+
+            pollUser.addPoll(poll);
+            pollUser2.addPoll(poll2);
+
 
             Vote vote = new Vote(Answer.NO, poll);
             Vote vote2 = new Vote(Answer.YES, poll2);
 
-            poll.addVote(vote);
-            poll2.addVote(vote2);
-            pollUser.addPoll(poll);
-            pollUser.addPoll(poll2);
+            //poll.addVote(vote);
+            //poll2.addVote(vote2);
+            //pollUser.addPoll(poll);
+            //pollUser.addPoll(poll2);
 
 
             em.getTransaction().begin();
 
-            em.persist(pollUser);
             em.persist(poll);
-            em.persist(pollUser2);
             em.persist(poll2);
             em.persist(vote);
             em.persist(vote2);
@@ -83,9 +97,6 @@ public class PollMain {
 
             Long pollId = poll.getId();
             Long pollId2 = poll2.getId();
-
-            Long userId = pollUser.getId();
-            Long userId2 = pollUser2.getId();
 
             Long voteId = vote.getId();
             Long voteId2 = vote2.getId();
@@ -204,18 +215,20 @@ public class PollMain {
 
             Gson gson = new Gson();
 
-            Poll tempPoll = gson.fromJson(req.body(), Poll.class);
-
             Long id = Long.parseLong(req.params("id"));
+            Poll oldPoll = pollMap.get(id);
+            Poll tempPoll = gson.fromJson(req.body(), Poll.class);
+            tempPoll.setPollUser(oldPoll.getPollUser());
+            tempPoll.setId(oldPoll.getId());
+
+            ema.getTransaction().begin();
+            ema.merge(tempPoll);
+            ema.getTransaction().commit();
+
 
             pollMap.put(id, tempPoll);
 
-            ema.getTransaction().begin();
-            ema.persist(tempPoll);
-            ema.merge(tempPoll.getPollUser());
-            ema.getTransaction().commit();
-
-            return pollMap.get(id).toJson();
+            return tempPoll.toJson();
 
         });
 
@@ -266,8 +279,9 @@ public class PollMain {
 
             ema.getTransaction().begin();
             ema.persist(tempPoll);
-            ema.merge(tempPoll.getPollUser());
-            tempPoll.getPollUser().addPoll(tempPoll);
+            PollUser tempUser = ema.find(PollUser.class,tempPoll.getPollUserId());
+            tempPoll.setPollUser(tempUser);
+            tempUser.addPoll(tempPoll);
             ema.getTransaction().commit();
 
             Long id = tempPoll.getId();
