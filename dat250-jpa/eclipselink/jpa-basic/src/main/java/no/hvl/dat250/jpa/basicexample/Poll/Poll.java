@@ -1,6 +1,9 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -84,8 +87,8 @@ public class Poll {
             joinColumns = @JoinColumn(name = "poll_fk"),
             inverseJoinColumns = @JoinColumn(name = "vote_fk"))
     private List<Vote> votes = new ArrayList<>();
-    public List<Vote> getVotes() { return votes; }
 
+    public List<Vote> getVotes() { return votes; }
     public void setVotes(List<Vote> votes) { this.votes = votes; }
 
     public void addVote(Vote vote){
@@ -114,25 +117,39 @@ public class Poll {
         return no;
     }
 
-    String toJson() {
+    String simpleToJson() {
         Gson gson = new Gson();
 
-        StringBuilder votes = new StringBuilder();
-
-        String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", isPrivate: " + isPrivate + ", pollUserId: " + pollUserId + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
+        //String jsonInString = gson.toJson("{ id: " + id + ", name: " + name + ", question: " + question + ", isPrivate: " + isPrivate + ", pollUserId: " + pollUserId + ", Yes votes: " + getYesVotes() + ", No Votes: " + getNoVotes());
+        String jsonInString = gson.toJson(this);
 
         System.out.println(pollUser);
         return jsonInString;
     }
 
-    String simpleToJson() {
-        Gson gson = new Gson();
+    String toJson() {
+        Gson gson = new GsonBuilder()
+                .addSerializationExclusionStrategy(strategy)
+                .create();
 
-        StringBuilder votes = new StringBuilder();
-
-        String jsonInString = gson.toJson(this);
+        String jsonInString = gson.toJson(this) + gson.toJson(" Yes votes: " + getYesVotes() + ", No votes: " + getNoVotes() + "}");
 
         return jsonInString;
     }
+
+    static ExclusionStrategy strategy = new ExclusionStrategy() {
+        @Override
+        public boolean shouldSkipField(FieldAttributes field) {
+            if (field.getDeclaringClass() == Poll.class && field.getName().equals("pollUser") ||  field.getName().equals("votes")) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+    };
 
 }

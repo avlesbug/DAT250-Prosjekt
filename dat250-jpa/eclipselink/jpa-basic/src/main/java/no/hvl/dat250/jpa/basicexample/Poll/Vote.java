@@ -1,8 +1,6 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
 
@@ -11,27 +9,26 @@ import javax.persistence.*;
 public class Vote {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Expose
     private Long id;
-    @Expose
     private Answer answer;
+    private Long pollId;
 
     public Vote(){
         answer = null;
     }
 
-    public Vote(Answer answer, Poll poll){
+    public Vote(Answer answer, Long pollId){
         this.answer = answer;
-        this.poll = poll;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.pollId = pollId;
     }
 
     @Id
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Answer getAnswer() {
@@ -41,6 +38,10 @@ public class Vote {
     public void setAnswer(Answer answer) {
         this.answer = answer;
     }
+
+    public Long getPollId(){ return pollId; }
+
+    public void setPollId(Long pollId){ this.pollId=pollId; }
 
 
     @ManyToOne
@@ -52,7 +53,7 @@ public class Vote {
     String toJson() {
         Gson gson = new Gson();
 
-        String jsonInString = gson.toJson(("{ VoteID: " + id + ", Answer: " + answer + ", PollID: " + poll.getId() + "}"));
+        String jsonInString = gson.toJson(("{ VoteID: " + id + ", Answer: " + answer + ", PollID: " + pollId + "}"));
         return jsonInString;
     }
 

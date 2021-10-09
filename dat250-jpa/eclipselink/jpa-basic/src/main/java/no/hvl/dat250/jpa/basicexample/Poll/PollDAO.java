@@ -9,44 +9,55 @@ import java.util.List;
 
 public class PollDAO {
     private static final String PERSISTENCE_UNIT_NAME = "people";
-    private static EntityManagerFactory factory;
+    private static EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 
 
-    @PersistenceUnit
-    public void setEmf(EntityManagerFactory emf){
-        this.factory = emf;
-    }
-
-    public Poll persistPoll(Poll poll) {
+    public void persistPoll(Poll poll) {
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
-        Poll savedPoll = em.merge(poll);
+        PollUser pollUser = em.find(PollUser.class,poll.getPollUserId());
+        em.persist(poll);
+        poll.setPollUser(pollUser);
+        pollUser.addPoll(poll);
         em.getTransaction().commit();
-        return savedPoll;
+        em.close();
     }
 
-    public Poll updateVote(Poll poll, Vote vote){
+    public void updatePoll(Poll poll){
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
-        poll.addVote(vote);
-        Poll savedPoll = em.merge(poll);
+        em.merge(poll);
         em.getTransaction().commit();
-        return savedPoll;
+        em.close();
     }
 
-    public Poll updateVotes(Poll poll, List<Vote> newVotes){
+
+
+    public void deletePoll(Poll poll){
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
-        List<Vote> votes = poll.getVotes();
-        votes.addAll(newVotes);
-        poll.setVotes(votes);
-        Poll savedPoll = em.merge(poll);
-        em.getTransaction().commit();
-        return savedPoll;
-    }
-
-
-    public void deletePoll(){
+        PollUser user = poll.getPollUser();
+        if(user!=null) {
+            user.removePoll(poll);
+            poll.setPollUser(null);
+            List<Vote> votes = poll.getVotes();
+            for (Vote v : votes) {
+                if(v!=null) {
+                    v.setPoll(null);
+                    em.merge(v);
+                }
+            }
+            em.merge(user);
+            em.remove(em.merge(poll));
+            for (Vote v : votes) {
+                if(v!=null) {
+                    em.remove(em.merge(v));
+                }
+            }
+            em.getTransaction().commit();
+        }
+        System.out.println("Deleted poll");
+        em.close();
 
     }
 }

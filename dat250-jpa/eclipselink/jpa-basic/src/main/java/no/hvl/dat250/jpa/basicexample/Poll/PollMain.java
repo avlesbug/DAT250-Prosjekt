@@ -39,11 +39,11 @@ public class PollMain {
         // do we have entries?
         boolean createNewEntries = (q.getResultList().size() == 0);
 
-
-
         if (createNewEntries) {
             PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
             PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", "Passord123");
+
+            em.getTransaction().begin();
 
             em.persist(pollUser);
             em.persist(pollUser2);
@@ -55,6 +55,12 @@ public class PollMain {
             Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId);
             Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2);
 
+            em.persist(poll);
+            em.persist(poll2);
+
+            Long pollId = poll.getId();
+            Long pollId2 = poll2.getId();
+
             poll.setPollUser(em.find(PollUser.class, userId));
             poll2.setPollUser(em.find(PollUser.class, userId2));
 
@@ -62,30 +68,15 @@ public class PollMain {
             pollUser2.addPoll(poll2);
 
 
-            Vote vote = new Vote(Answer.NO, poll);
-            Vote vote2 = new Vote(Answer.YES, poll2);
-
-            //poll.addVote(vote);
-            //poll2.addVote(vote2);
-            //pollUser.addPoll(poll);
-            //pollUser.addPoll(poll2);
-
-
-            em.getTransaction().begin();
-
-            em.persist(poll);
-            em.persist(poll2);
-            em.persist(vote);
-            em.persist(vote2);
-
             List<Vote> newVotes = new ArrayList<>();
             for (int i = 0; i < 20; i++) {
                 Vote newVote;
                 if (i % 2 == 1) {
-                    newVote = new Vote(Answer.YES, poll);
+                    newVote = new Vote(Answer.YES, pollId);
                 } else {
-                    newVote = new Vote(Answer.NO, poll);
+                    newVote = new Vote(Answer.NO, pollId);
                 }
+                newVote.setPoll(poll);
                 em.persist(newVote);
                 newVotes.add(newVote);
                 voteMap.put(newVote.getId(), newVote);
@@ -95,19 +86,13 @@ public class PollMain {
             em.getTransaction().commit();
             em.close();
 
-            Long pollId = poll.getId();
-            Long pollId2 = poll2.getId();
-
-            Long voteId = vote.getId();
-            Long voteId2 = vote2.getId();
 
 
             pollMap.put(pollId, poll);
             userMap.put(userId, pollUser);
             pollMap.put(pollId2, poll2);
             userMap.put(userId2, pollUser2);
-            voteMap.put(voteId, vote);
-            voteMap.put(voteId2, vote2);
+
         } else{
             //Add entities in jpa db to hashmaps
 
@@ -146,252 +131,331 @@ public class PollMain {
             res.type("application/json");
         });
 
-        EntityManager ema = factory.createEntityManager();;
+        EntityManager ema = factory.createEntityManager();
+        PollDAO pollDAO = new PollDAO();
+        PollUserDAO pollUserDAO = new PollUserDAO();
+        VoteDAO voteDAO = new VoteDAO();
 
         //Get
 
         get("/polls", (req, res) -> {
             Gson gson = new Gson();
-            StringBuilder string = new StringBuilder();
-            for(Poll p : pollMap.values()){
-                string.append(p.toJson());
-                string.append(',');
+            try {
+                StringBuilder string = new StringBuilder();
+                for (Poll p : pollMap.values()) {
+                    string.append(p.toJson());
+                    string.append("<---->");
+                }
+                if (string.length() > 1) {
+                    string.deleteCharAt(string.length() - 1);
+                    string.delete(string.length() - 6,string.length() - 1);
+                }
+                return gson.toJson(string);
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
             }
-            if(string.length()>1) {
-                string.deleteCharAt(string.length() - 1);
-            }
-            return gson.toJson(string);
         });
 
         get("/polls/:id", (req, res) -> {
             Gson gson = new Gson();
-            Long id = Long.parseLong(req.params("id"));
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                return pollMap.get(id).simpleToJson();
 
-            return pollMap.get(id).toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
         get("/users", (req, res) -> {
             Gson gson = new Gson();
-            StringBuilder string = new StringBuilder();
-            for(PollUser u : userMap.values()){
-                string.append(u.toJson());
-                string.append(',');
+            try {
+                StringBuilder string = new StringBuilder();
+                for (PollUser u : userMap.values()) {
+                    string.append(u.toJson());
+                    string.append(',');
+                }
+                if (string.length() > 1) {
+                    string.deleteCharAt(string.length() - 1);
+                }
+                return gson.toJson(string);
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
             }
-            if(string.length()>1) {
-                string.deleteCharAt(string.length() - 1);
-            }
-            return gson.toJson(string);
         });
 
         get("/users/:id", (req, res) -> {
             Gson gson = new Gson();
+            try{
             Long id = Long.parseLong(req.params("id"));
-            //return gson.toJson(userMap.get(id));
             return userMap.get(id).toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
         get("/votes", (req, res) -> {
             Gson gson = new Gson();
             StringBuilder string = new StringBuilder();
-            for(Vote v : voteMap.values()){
-                string.append(v.toJson());
-                string.append(',');
+            try {
+                for (Vote v : voteMap.values()) {
+                    string.append(v.toJson());
+                    string.append(',');
+                }
+                if (string.length() > 1) {
+                    string.deleteCharAt(string.length() - 1);
+                }
+                return gson.toJson(string);
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
             }
-            if(string.length()>1){
-                string.deleteCharAt(string.length()-1);
-            }
-            return gson.toJson(string);
-            //return voteMap.get(voteId).toJson();
         });
 
         get("/votes/:id", (req, res) -> {
             Gson gson = new Gson();
-            Long id = Long.parseLong(req.params("id"));
-            //return gson.toJson(userMap.get(id));
-            return voteMap.get(id).toJson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                return voteMap.get(id).toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
         //Put
         put("/polls/:id", (req, res) -> {
-
             Gson gson = new Gson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                Poll oldPoll = pollMap.get(id);
+                Poll newPoll = gson.fromJson(req.body(), Poll.class);
 
-            Long id = Long.parseLong(req.params("id"));
-            Poll oldPoll = pollMap.get(id);
-            Poll tempPoll = gson.fromJson(req.body(), Poll.class);
-            tempPoll.setPollUser(oldPoll.getPollUser());
-            tempPoll.setId(oldPoll.getId());
+                newPoll.setPollUser(oldPoll.getPollUser());
+                newPoll.setId(oldPoll.getId());
+                newPoll.setVotes(oldPoll.getVotes());
 
-            ema.getTransaction().begin();
-            ema.merge(tempPoll);
-            ema.getTransaction().commit();
+                pollDAO.updatePoll(newPoll);
 
+                pollMap.put(id, newPoll);
 
-            pollMap.put(id, tempPoll);
+                return newPoll.toJson();
 
-            return tempPoll.toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
 
         });
 
         put("/users/:id", (req, res) -> {
             Gson gson = new Gson();
-
-            PollUser user = gson.fromJson(req.body(), PollUser.class);
-
-            Long id = Long.parseLong(req.params("id"));
-
-            user.setId(id);
-
-            userMap.put(id,user);
-
             ema.getTransaction().begin();
-            ema.merge(user);
-            ema.getTransaction().commit();
+            try {
+                PollUser user = gson.fromJson(req.body(), PollUser.class);
+                Long id = Long.parseLong(req.params("id"));
+                user.setId(id);
+                userMap.put(id, user);
+                ema.merge(user);
+                ema.getTransaction().commit();
 
-
-            return user.toJson();
+                return user.toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                ema.getTransaction().commit();
+                return gson.toJson("Something went wrong...");
+            }
 
         });
 
         put("/votes/:id", (req, res) -> {
-
             Gson gson = new Gson();
-            em.getTransaction().begin();
+            try {
+                Vote tempVote = gson.fromJson(req.body(), Vote.class);
 
-            Vote tempVote = gson.fromJson(req.body(), Vote.class);
+                Long id = Long.parseLong(req.params("id"));
 
-            Long id = Long.parseLong(req.params("id"));
+                Vote oldVote = voteMap.get(id);
+                tempVote.setId(oldVote.getId());
 
-            voteMap.put(id, tempVote);
+                voteMap.put(id, tempVote);
 
-            em.persist(tempVote);
-            em.merge(tempVote);
-            em.getTransaction().commit();
+                voteDAO.updateVote(tempVote);
 
-            return voteMap.get(id).toJson();
+                return voteMap.get(id).toJson();
+
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
 
         //Post
         post("/polls", (req, res) -> {
             Gson gson = new Gson();
+            try {
+                Poll tempPoll = gson.fromJson(req.body(), Poll.class);
+                pollDAO.persistPoll(tempPoll);
+                Long id = tempPoll.getId();
+                pollMap.put(id, tempPoll);
 
-            Poll tempPoll = gson.fromJson(req.body(), Poll.class);
+                return tempPoll.toJson();
+            }catch (Exception e) {
+                return gson.toJson("Something went wrong...");
+            }
 
-            ema.getTransaction().begin();
-            ema.persist(tempPoll);
-            PollUser tempUser = ema.find(PollUser.class,tempPoll.getPollUserId());
-            tempPoll.setPollUser(tempUser);
-            tempUser.addPoll(tempPoll);
-            ema.getTransaction().commit();
-
-            Long id = tempPoll.getId();
-
-            pollMap.put(id, tempPoll);
-
-            return tempPoll.toJson();
 
         });
 
         post("/users", (req, res) -> {
             Gson gson = new Gson();
+            try {
+                PollUser user = gson.fromJson(req.body(), PollUser.class);
+                pollUserDAO.persistPollUser(user);
 
-            PollUser user = gson.fromJson(req.body(), PollUser.class);
+                Long id = user.getId();
 
-            ema.getTransaction().begin();
-            ema.persist(user);
-            ema.getTransaction().commit();
+                userMap.put(id, user);
 
-            Long id = user.getId();
+                return user.toJson();
 
-            userMap.put(id, user);
-
-
-            return user.toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                ema.getTransaction().commit();
+                return gson.toJson("Something went wrong...");
+            }
         });
 
         post("/votes", (req, res) -> {
             Gson gson = new Gson();
-            em.getTransaction().begin();
+            try{
+                Vote tempVote = gson.fromJson(req.body(), Vote.class);
+                voteDAO.persistVote(tempVote);
 
-            Vote tempVote = gson.fromJson(req.body(), Vote.class);
+                Long id = tempVote.getId();
 
-            em.persist(tempVote);
-            em.getTransaction().commit();
+                voteMap.put(id, tempVote);
 
-            Long id = tempVote.getId();
+                return tempVote.toJson();
 
-            voteMap.put(id, tempVote);
-
-            return tempVote.toJson();
-
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
         //Delete
 
         delete("/polls/:id", (req, res) -> {
             Gson gson = new Gson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                Poll deletedPoll = pollMap.get(id);
+                pollDAO.deletePoll(pollMap.get(id));
+                pollMap.remove(id);
+                return gson.toJson("Deleted poll: " + deletedPoll.toJson());
 
-            Long id = Long.parseLong(req.params("id"));
-
-            ema.getTransaction().begin();
-            ema.remove(pollMap.get(id));
-            ema.getTransaction().commit();
-            pollMap.remove(id);
-            StringBuilder string = new StringBuilder();
-            for(Poll p : pollMap.values()){
-                string.append(p.toJson());
-                string.append(',');
+            }catch (Exception e) {
+                return gson.toJson("Something went wrong...");
             }
-            if(string.length()>1){
-                string.deleteCharAt(string.length()-1);
-            }
-            return gson.toJson(string);
-
         });
 
         delete("/polls", (req, res) -> {
             Gson gson = new Gson();
-            pollMap = new HashMap<>();
-            return gson.toJson(pollMap);
-
+            try {
+                for(Long pollId : pollMap.keySet()){
+                    pollDAO.deletePoll(em.find(Poll.class, pollId));
+                }
+                pollMap = new HashMap<>();
+                return gson.toJson(pollMap);
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
         delete("/users/:id", (req, res) -> {
             Gson gson = new Gson();
-
             Long id = Long.parseLong(req.params("id"));
-            ema.getTransaction().begin();
-            ema.remove(userMap.get(id));
-            ema.getTransaction().commit();
+            PollUser tempUser = userMap.get(id);
+            List<Poll> polls = tempUser.getPollList();
+            if(polls!=null) {
+                while (polls.size()>1) {
+                    Poll poll = polls.get(polls.size()-1);
+                    pollDAO.deletePoll(poll);
+                }
+            }
+            pollUserDAO.deleteUser(tempUser);
             userMap.remove(id);
-
-            return gson.toJson(userMap);
+            return gson.toJson("Deleted: ") + tempUser.toJson();
 
         });
 
         delete("/users", (req, res) -> {
             Gson gson = new Gson();
-            userMap = new HashMap<>();
-            return gson.toJson(pollMap);
+            //try {
+                for(PollUser u : userMap.values()) {
+                    if (u != null) {
+                        List<Poll> polls = u.getPollList();
+                        while (polls.size()>1) {
+                            Poll deletedPoll = polls.get(polls.size()-1);
+                            deletedPoll.setPollUser(null);
+                            if(deletedPoll!=null) {
+                                pollDAO.deletePoll(deletedPoll);
+                                //pollMap.remove(deletedPoll.getId());
+                            }
+                        }
+                        u.setPollList(null);
+                        pollUserDAO.deleteUser(u);
+                    }
+                }
+                userMap = new HashMap<>();
+                return gson.toJson("Deleted all users");
+/**
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
+**/
 
         });
 
         delete("/votes/:id", (req, res) -> {
             Gson gson = new Gson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                Vote deletedVote = voteMap.get(id);
+                voteDAO.deleteVote(deletedVote);
+                voteMap.remove(id);
+                return gson.toJson("Deleted: ") + deletedVote.toJson();
 
-            Long id = Long.parseLong(req.params("id"));
-
-
-
-            voteMap.remove(id);
-
-            return gson.toJson(voteMap);
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
         delete("/votes", (req, res) -> {
             Gson gson = new Gson();
-            voteMap = new HashMap<>();
-            return gson.toJson(voteMap);
+            try {
+                for(Long voteId : voteMap.keySet()){
+                    voteDAO.deleteVote(em.find(Vote.class, voteId));
+                }
+                voteMap = new HashMap<>();
+                return gson.toJson("Deleted all votes");
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
         });
 
     }

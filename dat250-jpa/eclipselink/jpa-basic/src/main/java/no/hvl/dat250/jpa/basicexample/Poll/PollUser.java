@@ -23,7 +23,6 @@ public class PollUser {
             name = "Poll User";
             email = "poll@user.com";
             password = "Password";
-            pollList = this.getPollList();
         }
 
         public PollUser(String name, String email, String password){
@@ -92,7 +91,7 @@ public class PollUser {
         Gson gson = new GsonBuilder()
                 .addSerializationExclusionStrategy(strategy)
                 .create();
-        String jsonInString = gson.toJson(this);
+        String jsonInString = gson.toJson(this) + gson.toJson("  'Number of polls': " + pollList.size() + "}");
 
         return jsonInString;
     }
