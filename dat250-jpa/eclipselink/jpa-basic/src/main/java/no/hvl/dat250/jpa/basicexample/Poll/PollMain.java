@@ -162,7 +162,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                return pollMap.get(id).simpleToJson();
+                return pollMap.get(id).toJson();
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
@@ -256,19 +256,18 @@ public class PollMain {
 
         put("/users/:id", (req, res) -> {
             Gson gson = new Gson();
-            ema.getTransaction().begin();
             try {
                 PollUser user = gson.fromJson(req.body(), PollUser.class);
                 Long id = Long.parseLong(req.params("id"));
                 user.setId(id);
+                PollUser oldUser = userMap.get(id);
+                user.setPollList(oldUser.getPollList());
+                pollUserDAO.updatePollUser(user);
                 userMap.put(id, user);
-                ema.merge(user);
-                ema.getTransaction().commit();
 
                 return user.toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                ema.getTransaction().commit();
                 return gson.toJson("Something went wrong...");
             }
 
