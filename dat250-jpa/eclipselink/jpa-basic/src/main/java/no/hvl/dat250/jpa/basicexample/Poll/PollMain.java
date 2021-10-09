@@ -283,6 +283,7 @@ public class PollMain {
 
                 Vote oldVote = voteMap.get(id);
                 tempVote.setId(oldVote.getId());
+                tempVote.setPoll(oldVote.getPoll());
 
                 voteMap.put(id, tempVote);
 
