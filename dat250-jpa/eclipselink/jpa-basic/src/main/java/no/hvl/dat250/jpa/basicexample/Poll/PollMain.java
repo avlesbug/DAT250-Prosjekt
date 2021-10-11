@@ -19,9 +19,10 @@ import static spark.Spark.delete;
 public class PollMain {
     private static final String PERSISTENCE_UNIT_NAME = "people";
     private static EntityManagerFactory factory;
-    static HashMap<Long, Poll> pollMap = new HashMap<>();
-    static HashMap<Long, PollUser> userMap = new HashMap<>();
-    static HashMap<Long, Vote> voteMap = new HashMap<>();
+    private static HashMap<Long,PollUser> userMap = new HashMap<>();
+    private static HashMap<Long,Vote> voteMap = new HashMap<>();
+    private static HashMap<Long,Poll> pollMap = new HashMap<>();
+
 
 
 
@@ -79,45 +80,11 @@ public class PollMain {
                 newVote.setPoll(poll);
                 em.persist(newVote);
                 newVotes.add(newVote);
-                voteMap.put(newVote.getId(), newVote);
             }
             poll.setVotes(newVotes);
 
             em.getTransaction().commit();
             em.close();
-
-
-
-            pollMap.put(pollId, poll);
-            userMap.put(userId, pollUser);
-            pollMap.put(pollId2, poll2);
-            userMap.put(userId2, pollUser2);
-
-        } else{
-            //Add entities in jpa db to hashmaps
-
-            //Users
-            List<PollUser> users = q.getResultList();
-            for (PollUser u : users){
-                userMap.put(u.getId(),u);
-            }
-
-            Query qp = em.createQuery("select p from Poll p");
-
-            //Polls
-            List<Poll> polls = qp.getResultList();
-            for (Poll p : polls){
-                pollMap.put(p.getId(),p);
-            }
-
-            Query qv = em.createQuery("select v from Vote v");
-
-            //Polls
-            List<Vote> votes = qv.getResultList();
-            for (Vote v : votes){
-                voteMap.put(v.getId(),v);
-            }
-
         }
 
 
@@ -131,7 +98,6 @@ public class PollMain {
             res.type("application/json");
         });
 
-        EntityManager ema = factory.createEntityManager();
         PollDAO pollDAO = new PollDAO();
         PollUserDAO pollUserDAO = new PollUserDAO();
         VoteDAO voteDAO = new VoteDAO();
@@ -142,7 +108,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 StringBuilder string = new StringBuilder();
-                for (Poll p : pollMap.values()) {
+                for (Poll p : pollDAO.getPolls()) {
                     string.append(p.toJson());
                     string.append("<---->");
                 }
@@ -162,7 +128,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                return pollMap.get(id).toJson();
+                return pollDAO.findById(id).toJson();
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
@@ -174,7 +140,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 StringBuilder string = new StringBuilder();
-                for (PollUser u : userMap.values()) {
+                for (PollUser u : pollUserDAO.getUsers()) {
                     string.append(u.toJson());
                     string.append(',');
                 }
@@ -193,7 +159,7 @@ public class PollMain {
             Gson gson = new Gson();
             try{
             Long id = Long.parseLong(req.params("id"));
-            return userMap.get(id).toJson();
+            return pollUserDAO.findById(id).toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong...");
@@ -204,7 +170,7 @@ public class PollMain {
             Gson gson = new Gson();
             StringBuilder string = new StringBuilder();
             try {
-                for (Vote v : voteMap.values()) {
+                for (Vote v : voteDAO.getVotes()) {
                     string.append(v.toJson());
                     string.append(',');
                 }
@@ -223,7 +189,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                return voteMap.get(id).toJson();
+                return voteDAO.findById(id).toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong...");
@@ -234,7 +200,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                Poll oldPoll = pollMap.get(id);
+                Poll oldPoll = pollDAO.findById(id);
                 Poll newPoll = gson.fromJson(req.body(), Poll.class);
 
                 newPoll.setPollUser(oldPoll.getPollUser());
@@ -242,8 +208,6 @@ public class PollMain {
                 newPoll.setVotes(oldPoll.getVotes());
 
                 pollDAO.updatePoll(newPoll);
-
-                pollMap.put(id, newPoll);
 
                 return newPoll.toJson();
 
@@ -260,10 +224,9 @@ public class PollMain {
                 PollUser user = gson.fromJson(req.body(), PollUser.class);
                 Long id = Long.parseLong(req.params("id"));
                 user.setId(id);
-                PollUser oldUser = userMap.get(id);
+                PollUser oldUser = pollUserDAO.findById(id);
                 user.setPollList(oldUser.getPollList());
                 pollUserDAO.updatePollUser(user);
-                userMap.put(id, user);
 
                 return user.toJson();
             }catch (Exception e) {
@@ -280,15 +243,13 @@ public class PollMain {
 
                 Long id = Long.parseLong(req.params("id"));
 
-                Vote oldVote = voteMap.get(id);
+                Vote oldVote = voteDAO.findById(id);
                 tempVote.setId(oldVote.getId());
                 tempVote.setPoll(oldVote.getPoll());
 
-                voteMap.put(id, tempVote);
-
                 voteDAO.updateVote(tempVote);
 
-                return voteMap.get(id).toJson();
+                return voteDAO.findById(id).toJson();
 
 
             }catch (Exception e) {
@@ -305,7 +266,6 @@ public class PollMain {
                 Poll tempPoll = gson.fromJson(req.body(), Poll.class);
                 pollDAO.persistPoll(tempPoll);
                 Long id = tempPoll.getId();
-                pollMap.put(id, tempPoll);
 
                 return tempPoll.toJson();
             }catch (Exception e) {
@@ -323,13 +283,10 @@ public class PollMain {
 
                 Long id = user.getId();
 
-                userMap.put(id, user);
-
                 return user.toJson();
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                ema.getTransaction().commit();
                 return gson.toJson("Something went wrong...");
             }
         });
@@ -341,8 +298,6 @@ public class PollMain {
                 voteDAO.persistVote(tempVote);
 
                 Long id = tempVote.getId();
-
-                voteMap.put(id, tempVote);
 
                 return tempVote.toJson();
 
@@ -358,9 +313,8 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                Poll deletedPoll = pollMap.get(id);
-                pollDAO.deletePoll(pollMap.get(id));
-                pollMap.remove(id);
+                Poll deletedPoll = pollDAO.findById(id);
+                pollDAO.deletePoll(deletedPoll);
                 return gson.toJson("Deleted poll: " + deletedPoll.toJson());
 
             }catch (Exception e) {
@@ -371,11 +325,10 @@ public class PollMain {
         delete("/polls", (req, res) -> {
             Gson gson = new Gson();
             try {
-                for(Long pollId : pollMap.keySet()){
-                    pollDAO.deletePoll(em.find(Poll.class, pollId));
+                for(Poll poll : pollDAO.getPolls()){
+                    pollDAO.deletePoll(poll);
                 }
-                pollMap = new HashMap<>();
-                return gson.toJson(pollMap);
+                return gson.toJson(pollDAO.getPolls());
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong...");
@@ -384,25 +337,30 @@ public class PollMain {
 
         delete("/users/:id", (req, res) -> {
             Gson gson = new Gson();
-            Long id = Long.parseLong(req.params("id"));
-            PollUser tempUser = userMap.get(id);
-            List<Poll> polls = tempUser.getPollList();
-            if(polls!=null) {
-                while (polls.size()>1) {
-                    Poll poll = polls.get(polls.size()-1);
-                    pollDAO.deletePoll(poll);
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                PollUser tempUser = pollUserDAO.findById(id);
+                List<Poll> polls = tempUser.getPollList();
+                if (polls != null) {
+                    while (polls.size() > 0) {
+                        Poll poll = polls.get(polls.size() - 1);
+                        pollDAO.deletePoll(poll);
+                    }
                 }
+                pollUserDAO.deleteUser(tempUser);
+                return gson.toJson("Deleted: ") + tempUser.toJson();
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
             }
-            pollUserDAO.deleteUser(tempUser);
-            userMap.remove(id);
-            return gson.toJson("Deleted: ") + tempUser.toJson();
 
         });
 
         delete("/users", (req, res) -> {
             Gson gson = new Gson();
-            //try {
-                for(PollUser u : userMap.values()) {
+            try {
+                for(PollUser u : pollUserDAO.getUsers()) {
                     if (u != null) {
                         List<Poll> polls = u.getPollList();
                         while (polls.size()>1) {
@@ -410,21 +368,19 @@ public class PollMain {
                             deletedPoll.setPollUser(null);
                             if(deletedPoll!=null) {
                                 pollDAO.deletePoll(deletedPoll);
-                                //pollMap.remove(deletedPoll.getId());
                             }
                         }
                         u.setPollList(null);
                         pollUserDAO.deleteUser(u);
                     }
                 }
-                userMap = new HashMap<>();
                 return gson.toJson("Deleted all users");
-/**
+
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong...");
             }
-**/
+
 
         });
 
@@ -432,9 +388,8 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                Vote deletedVote = voteMap.get(id);
+                Vote deletedVote = voteDAO.findById(id);
                 voteDAO.deleteVote(deletedVote);
-                voteMap.remove(id);
                 return gson.toJson("Deleted: ") + deletedVote.toJson();
 
             }catch (Exception e) {
@@ -446,10 +401,9 @@ public class PollMain {
         delete("/votes", (req, res) -> {
             Gson gson = new Gson();
             try {
-                for(Long voteId : voteMap.keySet()){
-                    voteDAO.deleteVote(em.find(Vote.class, voteId));
+                for(Vote vote : voteDAO.getVotes()){
+                    voteDAO.deleteVote(vote);
                 }
-                voteMap = new HashMap<>();
                 return gson.toJson("Deleted all votes");
 
             }catch (Exception e) {

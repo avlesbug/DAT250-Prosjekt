@@ -1,9 +1,6 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceUnit;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +36,25 @@ public class VoteDAO {
         }
         em.close();
 
+    }
+
+    public List<Vote> getVotes(){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Query q = em.createQuery("select v from Vote v");
+        List<Vote> allVotes = q.getResultList();
+        em.getTransaction().commit();
+        em.close();
+        return allVotes;
+    }
+
+    public Vote findById(Long id){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Vote vote = em.find(Vote.class,id);
+        em.getTransaction().commit();
+        em.close();
+        return vote;
     }
 
 

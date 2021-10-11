@@ -7,19 +7,6 @@ public class PollUserDAO {
     private static final String PERSISTENCE_UNIT_NAME = "people";
     private static EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 
-    public PollUser findById(Long pollUserId) {
-        EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
-        if(pollUserId!=null) {
-            PollUser pollUser = em.find(PollUser.class, pollUserId);
-            if (pollUser == null) {
-                throw new EntityNotFoundException("Can't find pollUser for ID: "
-                        + pollUserId);
-            }
-            return pollUser;
-        }
-        return null;
-    }
 
     public void persistPollUser(PollUser pollUser){
         EntityManager em = factory.createEntityManager();
@@ -40,12 +27,29 @@ public class PollUserDAO {
     public void deleteUser(PollUser pollUser){
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
-        if(em.contains(pollUser)) {
-            em.remove(em.merge(pollUser));
-            em.getTransaction().commit();
-        }
+        em.remove(em.merge(pollUser));
+        em.getTransaction().commit();
         em.close();
 
+    }
+
+    public List<PollUser> getUsers(){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Query q = em.createQuery("select u from PollUser u");
+        List<PollUser> allUsers = q.getResultList();
+        em.getTransaction().commit();
+        em.close();
+        return allUsers;
+    }
+
+    public PollUser findById(Long id){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        PollUser user = em.find(PollUser.class,id);
+        em.getTransaction().commit();
+        em.close();
+        return user;
     }
 
 }

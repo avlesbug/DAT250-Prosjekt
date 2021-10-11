@@ -1,10 +1,8 @@
 
 package no.hvl.dat250.jpa.basicexample.Poll;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.PersistenceUnit;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PollDAO {
@@ -56,8 +54,26 @@ public class PollDAO {
             }
             em.getTransaction().commit();
         }
-        System.out.println("Deleted poll");
         em.close();
 
+    }
+
+    public List<Poll> getPolls(){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Query q = em.createQuery("select p from Poll p");
+        List<Poll> allPolls = q.getResultList();
+        em.getTransaction().commit();
+        em.close();
+        return allPolls;
+    }
+
+    public Poll findById(Long id){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Poll poll = em.find(Poll.class,id);
+        em.getTransaction().commit();
+        em.close();
+        return poll;
     }
 }
