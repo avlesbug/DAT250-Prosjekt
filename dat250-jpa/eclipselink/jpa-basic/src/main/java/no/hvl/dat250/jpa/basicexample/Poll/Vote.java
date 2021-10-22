@@ -1,6 +1,9 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import javax.persistence.*;
 
@@ -13,11 +16,11 @@ public class Vote {
     private Answer answer;
     private Long pollId;
 
-    public Vote(){
+    public Vote() {
         answer = null;
     }
 
-    public Vote(Answer answer, Long pollId){
+    public Vote(Answer answer, Long pollId) {
         this.answer = answer;
         this.pollId = pollId;
     }
@@ -39,18 +42,28 @@ public class Vote {
         this.answer = answer;
     }
 
-    public Long getPollId(){ return pollId; }
+    public Long getPollId() {
+        return pollId;
+    }
 
-    public void setPollId(Long pollId){ this.pollId=pollId; }
+    public void setPollId(Long pollId) {
+        this.pollId = pollId;
+    }
 
 
     @ManyToOne
     private Poll poll;
-    public Poll getPoll() { return poll; }
-    public void setPoll(Poll poll) { this.poll = poll; }
+
+    public Poll getPoll() {
+        return poll;
+    }
+
+    public void setPoll(Poll poll) {
+        this.poll = poll;
+    }
 
 
-    String toJson() {
+    String oldtoJson() {
         Gson gson = new Gson();
 
         String jsonInString = gson.toJson(("{ VoteID: " + id + ", Answer: " + answer + ", PollID: " + pollId + "}"));
@@ -58,11 +71,28 @@ public class Vote {
     }
 
 
-    String simpleToJson() {
-        Gson gson = new Gson();
+    String toJson() {
+        Gson gson = new GsonBuilder()
+                .addSerializationExclusionStrategy(strategy)
+                .create();
 
         String jsonInString = gson.toJson(this);
 
         return jsonInString;
     }
+
+    static ExclusionStrategy strategy = new ExclusionStrategy() {
+        @Override
+        public boolean shouldSkipField(FieldAttributes field) {
+            if (field.getDeclaringClass() == Vote.class && field.getName().equals("poll")) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean shouldSkipClass(Class<?> clazz) {
+            return false;
+        }
+    };
 }
