@@ -2,6 +2,7 @@ package no.hvl.dat250.jpa.basicexample.Poll;
 
 import com.google.gson.Gson;
 import lombok.Lombok;
+import spark.Filter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +20,6 @@ import static spark.Spark.delete;
 public class PollMain {
     private static final String PERSISTENCE_UNIT_NAME = "people";
     private static EntityManagerFactory factory;
-    private static HashMap<Long,PollUser> userMap = new HashMap<>();
-    private static HashMap<Long,Vote> voteMap = new HashMap<>();
-    private static HashMap<Long,Poll> pollMap = new HashMap<>();
 
 
 
@@ -96,6 +94,11 @@ public class PollMain {
 
         after((req, res) -> {
             res.type("application/json");
+        });
+
+        after((Filter) (request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Methods", "GET");
         });
 
         PollDAO pollDAO = new PollDAO();

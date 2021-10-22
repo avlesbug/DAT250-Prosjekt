@@ -132,7 +132,7 @@ public class Poll {
                 .addSerializationExclusionStrategy(strategy)
                 .create();
 
-        String jsonInString = gson.toJson(this) + gson.toJson(" Yes votes: " + getYesVotes() + ", No votes: " + getNoVotes() + "}");
+        String jsonInString = gson.toJson(this);// + gson.toJson(" Yes votes: " + getYesVotes() + ", No votes: " + getNoVotes() + "}");
 
         return jsonInString;
     }

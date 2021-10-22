@@ -91,7 +91,7 @@ public class PollUser {
         Gson gson = new GsonBuilder()
                 .addSerializationExclusionStrategy(strategy)
                 .create();
-        String jsonInString = gson.toJson(this) + gson.toJson("  'Number of polls': " + pollList.size() + "}");
+        String jsonInString = gson.toJson(this);// + gson.toJson("  'Number of polls:' " + pollList.size() + "}");
 
         return jsonInString;
     }
