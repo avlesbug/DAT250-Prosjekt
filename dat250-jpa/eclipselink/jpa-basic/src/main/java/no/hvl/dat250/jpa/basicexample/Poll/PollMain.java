@@ -1,11 +1,9 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
 import com.google.gson.Gson;
-import lombok.Lombok;
 import spark.Filter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -51,8 +49,8 @@ public class PollMain {
             Long userId = pollUser.getId();
             Long userId2 = pollUser2.getId();
 
-            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId);
-            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2);
+            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId, Answer.YES, Answer.NO);
+            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2,Answer.YES, Answer.NO);
 
             em.persist(poll);
             em.persist(poll2);
@@ -193,6 +191,20 @@ public class PollMain {
             try {
                 Long id = Long.parseLong(req.params("id"));
                 return voteDAO.findById(id).toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
+        });
+
+        get("/votesforpoll/:id", (req, res) -> {
+            Gson gson = new Gson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                Poll poll = pollDAO.findById(id);
+                int yVotes = poll.getOpt1Votes();
+                int nVotes = poll.getOpt2Votes();
+                return gson.toJson("Yes votes: " + yVotes + ", No votes: " + nVotes);
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong...");

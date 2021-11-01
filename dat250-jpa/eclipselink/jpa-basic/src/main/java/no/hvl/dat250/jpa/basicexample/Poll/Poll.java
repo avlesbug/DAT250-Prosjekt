@@ -19,6 +19,8 @@ public class Poll {
     private String question;
     private Long pollUserId;
     private boolean isPrivate;
+    private Answer opt1;
+    private Answer opt2;
 
     public Poll(){
         name = "Unnamed poll";
@@ -26,12 +28,14 @@ public class Poll {
         isPrivate = false;
     }
 
-    public Poll(String name, String question,boolean isPrivate, Long pollUserId){
+    public Poll(String name, String question,boolean isPrivate, Long pollUserId, Answer opt1, Answer opt2){
 
         this.name = name;
         this.question = question;
         this.isPrivate = isPrivate;
         this.pollUserId = pollUserId;
+        this.opt1 = opt1;
+        this.opt2 = opt2;
 
     }
 
@@ -51,6 +55,14 @@ public class Poll {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Answer getOpt1(){ return opt1; }
+
+    public void setOpt1(Answer opt1) { this.opt1 = opt1; }
+
+    public Answer getOpt2() { return opt2; }
+
+    public void setOpt2(Answer opt2) { this.opt2 = opt2; }
 
     public String getQuestion() {
         return question;
@@ -95,26 +107,26 @@ public class Poll {
         votes.add(vote);
     }
 
-    public int getYesVotes(){
-        int yes = 0;
+    public int getOpt1Votes(){
+        int opt1 = 0;
         for(Vote v : getVotes()){
             if(v.getAnswer() == Answer.YES){
-                yes++;
+                opt1++;
             }
         }
 
-        return yes;
+        return opt1;
     }
 
-    public int getNoVotes(){
-        int no = 0;
+    public int getOpt2Votes(){
+        int opt2 = 0;
         for(Vote v : getVotes()){
             if(v.getAnswer() == Answer.NO){
-                no++;
+                opt2++;
             }
         }
 
-        return no;
+        return opt2;
     }
 
     String simpleToJson() {
