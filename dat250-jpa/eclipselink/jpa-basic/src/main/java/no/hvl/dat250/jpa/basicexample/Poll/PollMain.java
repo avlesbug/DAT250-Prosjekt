@@ -218,10 +218,8 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                Poll poll = pollDAO.findById(id);
-                int opt1Votes = poll.getOpt1Votes();
-                int opt2Votes = poll.getOpt2Votes();
-                return gson.toJson(poll.getOpt1().toString() + " votes: " + opt1Votes + ", " + poll.getOpt2().toString() +" votes " + opt2Votes);
+
+                return gson.toJson(pollDAO.getVotesforPoll(id));
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong...");

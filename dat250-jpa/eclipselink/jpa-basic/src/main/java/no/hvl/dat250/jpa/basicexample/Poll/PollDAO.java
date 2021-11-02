@@ -76,4 +76,15 @@ public class PollDAO {
         em.close();
         return poll;
     }
+
+    public String getVotesforPoll(Long id){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        Poll poll = em.find(Poll.class,id);
+        int opt1Votes = poll.getOpt1Votes();
+        int opt2Votes = poll.getOpt2Votes();
+        em.getTransaction().commit();
+        em.close();
+        return poll.getOpt1().toString() + " votes: " + opt1Votes + ", " + poll.getOpt2().toString() +" votes " + opt2Votes;
+    }
 }
