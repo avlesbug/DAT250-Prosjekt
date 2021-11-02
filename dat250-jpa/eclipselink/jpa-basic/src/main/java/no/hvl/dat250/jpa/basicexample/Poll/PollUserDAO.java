@@ -56,7 +56,7 @@ public class PollUserDAO {
     public List<Integer> getPollIds(Long id){
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
-        PollUser user = em.find(PollUser.class,id);
+        PollUser user = findById(id);
         List<Integer> pollIds = new ArrayList<>();
         List<Poll> polls = user.getPollList();
         for(Poll p : polls){

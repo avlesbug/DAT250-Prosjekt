@@ -137,7 +137,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Could not find poll... Make sure the ID is correct");
             }
         });
 
@@ -150,7 +150,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Could not find polls... Make sure the User ID is correct");
             }
         });
 
@@ -180,7 +180,7 @@ public class PollMain {
             return pollUserDAO.findById(id).toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Could not find user... Make sure the ID is correct");
             }
         });
 
@@ -210,7 +210,7 @@ public class PollMain {
                 return voteDAO.findById(id).toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Could not find vote... Make sure the ID is correct");
             }
         });
 
@@ -222,7 +222,7 @@ public class PollMain {
                 return gson.toJson(pollDAO.getVotesforPoll(id));
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Could not find votes... Make sure the user ID is correct");
             }
         });
         //Put
@@ -243,7 +243,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the ID and format is correct");
             }
 
         });
@@ -261,7 +261,7 @@ public class PollMain {
                 return user.toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the ID and format is correct");
             }
 
         });
@@ -277,14 +277,18 @@ public class PollMain {
                 tempVote.setId(oldVote.getId());
                 tempVote.setPoll(oldVote.getPoll());
 
-                voteDAO.updateVote(tempVote);
+                if(tempVote.getAnswer()!= null) {
+                    voteDAO.updateVote(tempVote);
+                } else {
+                    return gson.toJson("Invalid answer");
+                }
 
                 return voteDAO.findById(id).toJson();
 
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the ID and format is correct");
             }
         });
 
@@ -299,7 +303,7 @@ public class PollMain {
 
                 return tempPoll.toJson();
             }catch (Exception e) {
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the format is correct");
             }
 
 
@@ -317,7 +321,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the format is correct");
             }
         });
 
@@ -333,7 +337,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the format is correct");
             }
         });
 
@@ -348,7 +352,7 @@ public class PollMain {
                 return gson.toJson("Deleted poll: " + deletedPoll.toJson());
 
             }catch (Exception e) {
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the ID is correct");
             }
         });
 
@@ -382,7 +386,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the ID is correct");
             }
 
         });
@@ -424,7 +428,7 @@ public class PollMain {
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong...");
+                return gson.toJson("Something went wrong... Make sure the ID is correct");
             }
         });
 

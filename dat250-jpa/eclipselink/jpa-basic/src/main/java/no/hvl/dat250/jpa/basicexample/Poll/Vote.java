@@ -17,7 +17,6 @@ public class Vote {
     private Long pollId;
 
     public Vote() {
-        answer = null;
     }
 
     public Vote(Answer answer, Long pollId) {
