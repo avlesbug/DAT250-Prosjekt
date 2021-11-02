@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,14 +22,17 @@ public class Poll {
     private boolean isPrivate;
     private Answer opt1;
     private Answer opt2;
+    private LocalDate endDate;
 
     public Poll(){
         name = "Unnamed poll";
         question = "undefined question";
         isPrivate = false;
+        this.opt1 = Answer.YES;
+        this.opt2 = Answer.NO;
     }
 
-    public Poll(String name, String question,boolean isPrivate, Long pollUserId, Answer opt1, Answer opt2){
+    public Poll(String name, String question,boolean isPrivate, Long pollUserId, Answer opt1, Answer opt2, LocalDate endDate){
 
         this.name = name;
         this.question = question;
@@ -36,6 +40,7 @@ public class Poll {
         this.pollUserId = pollUserId;
         this.opt1 = opt1;
         this.opt2 = opt2;
+        this.endDate = endDate;
 
     }
 

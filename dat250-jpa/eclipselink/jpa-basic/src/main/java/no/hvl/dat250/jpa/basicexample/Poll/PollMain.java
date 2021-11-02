@@ -3,6 +3,8 @@ package no.hvl.dat250.jpa.basicexample.Poll;
 import com.google.gson.Gson;
 import spark.Filter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +51,10 @@ public class PollMain {
             Long userId = pollUser.getId();
             Long userId2 = pollUser2.getId();
 
-            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId, Answer.YES, Answer.NO);
-            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2,Answer.YES, Answer.NO);
+            LocalDate endDate = LocalDate.of(2021,12,16);
+
+            Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId, Answer.YES, Answer.NO,endDate);
+            Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2,Answer.YES, Answer.NO,endDate);
 
             em.persist(poll);
             em.persist(poll2);
