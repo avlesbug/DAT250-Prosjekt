@@ -1,6 +1,7 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PollUserDAO {
@@ -50,6 +51,20 @@ public class PollUserDAO {
         em.getTransaction().commit();
         em.close();
         return user;
+    }
+
+    public List<Integer> getPollIds(Long id){
+        EntityManager em = factory.createEntityManager();
+        em.getTransaction().begin();
+        PollUser user = em.find(PollUser.class,id);
+        List<Integer> pollIds = new ArrayList<>();
+        List<Poll> polls = user.getPollList();
+        for(Poll p : polls){
+            pollIds.add(p.getId().intValue());
+        }
+        em.getTransaction().commit();
+        em.close();
+        return pollIds;
     }
 
 }

@@ -145,12 +145,7 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                PollUser user = pollUserDAO.findById(id);
-                List<Integer> pollIds = new ArrayList<>();
-                List<Poll> polls = user.getPollList();
-                for(Poll p : polls){
-                    pollIds.add(p.getId().intValue());
-                }
+                List<Integer> pollIds = pollUserDAO.getPollIds(id);
                 return gson.toJson(pollIds);
 
             }catch (Exception e) {
