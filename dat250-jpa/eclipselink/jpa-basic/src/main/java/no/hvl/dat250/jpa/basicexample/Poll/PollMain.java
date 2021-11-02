@@ -137,6 +137,24 @@ public class PollMain {
             }
         });
 
+        get("/pollsforuser/:id", (req, res) -> {
+            Gson gson = new Gson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                PollUser user = pollUserDAO.findById(id);
+                List<Integer> pollIds = new ArrayList<>();
+                List<Poll> polls = user.getPollList();
+                for(Poll p : polls){
+                    pollIds.add(p.getId().intValue());
+                }
+                return gson.toJson(pollIds);
+
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong...");
+            }
+        });
+
         get("/users", (req, res) -> {
             Gson gson = new Gson();
             try {
