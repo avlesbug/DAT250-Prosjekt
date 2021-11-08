@@ -30,9 +30,13 @@ public class PollDAO {
         stop(em);
     }
 
-    public void updatePoll(Poll poll){
+    public void updatePoll(Poll newPoll, Long id){
         EntityManager em = start();
-        em.merge(poll);
+        Poll oldPoll = findById(id);
+        newPoll.setPollUser(oldPoll.getPollUser());
+        newPoll.setId(oldPoll.getId());
+        newPoll.setVotes(oldPoll.getVotes());
+        em.merge(newPoll);
         stop(em);
     }
 
@@ -86,5 +90,12 @@ public class PollDAO {
         int opt2Votes = poll.getOpt2Votes();
         stop(em);
         return poll.getOpt1().toString() + " votes: " + opt1Votes + ", " + poll.getOpt2().toString() +" votes " + opt2Votes;
+    }
+
+    public Result getResults(Long id) {
+        Poll poll = findById(id);
+        Result result = new Result(poll.getQuestion(),poll.getOpt1(),poll.getOpt2(),poll.getId(),poll.getPollUserId(),poll.getOpt1Votes(),poll.getOpt2Votes());
+
+        return result;
     }
 }

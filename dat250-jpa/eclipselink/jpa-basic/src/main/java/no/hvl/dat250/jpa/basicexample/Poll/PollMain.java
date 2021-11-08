@@ -218,8 +218,18 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-
                 return gson.toJson(pollDAO.getVotesforPoll(id));
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Could not find votes... Make sure the user ID is correct");
+            }
+        });
+
+        get("/results/:id", (req, res) -> {
+            Gson gson = new Gson();
+            try {
+                Long id = Long.parseLong(req.params("id"));
+                return gson.toJson(pollDAO.getResults(id));
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Could not find votes... Make sure the user ID is correct");
@@ -230,15 +240,8 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
-                Poll oldPoll = pollDAO.findById(id);
                 Poll newPoll = gson.fromJson(req.body(), Poll.class);
-
-                newPoll.setPollUser(oldPoll.getPollUser());
-                newPoll.setId(oldPoll.getId());
-                newPoll.setVotes(oldPoll.getVotes());
-
-                pollDAO.updatePoll(newPoll);
-
+                pollDAO.updatePoll(newPoll,id);
                 return newPoll.toJson();
 
             }catch (Exception e) {
