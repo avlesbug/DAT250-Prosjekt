@@ -28,9 +28,12 @@ public class VoteDAO {
         stop(em);
     }
 
-    public void updateVote(Vote vote){
+    public void updateVote(Vote newVote,Long id){
         EntityManager em = start();
-        em.merge(vote);
+        Vote oldVote = findById(id);
+        newVote.setId(oldVote.getId());
+        newVote.setPoll(oldVote.getPoll());
+        em.merge(newVote);
         stop(em);
     }
 

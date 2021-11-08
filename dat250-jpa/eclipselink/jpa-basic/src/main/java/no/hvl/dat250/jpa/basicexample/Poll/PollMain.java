@@ -256,11 +256,7 @@ public class PollMain {
             try {
                 PollUser user = gson.fromJson(req.body(), PollUser.class);
                 Long id = Long.parseLong(req.params("id"));
-                user.setId(id);
-                PollUser oldUser = pollUserDAO.findById(id);
-                user.setPollList(oldUser.getPollList());
-                pollUserDAO.updatePollUser(user);
-
+                pollUserDAO.updatePollUser(user, id);
                 return user.toJson();
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
@@ -273,15 +269,10 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Vote tempVote = gson.fromJson(req.body(), Vote.class);
-
                 Long id = Long.parseLong(req.params("id"));
 
-                Vote oldVote = voteDAO.findById(id);
-                tempVote.setId(oldVote.getId());
-                tempVote.setPoll(oldVote.getPoll());
-
                 if(tempVote.getAnswer()!= null) {
-                    voteDAO.updateVote(tempVote);
+                    voteDAO.updateVote(tempVote,id);
                 } else {
                     return gson.toJson("Invalid answer");
                 }
@@ -302,7 +293,6 @@ public class PollMain {
             try {
                 Poll tempPoll = gson.fromJson(req.body(), Poll.class);
                 pollDAO.persistPoll(tempPoll);
-                Long id = tempPoll.getId();
 
                 return tempPoll.toJson();
             }catch (Exception e) {
@@ -318,8 +308,6 @@ public class PollMain {
                 PollUser user = gson.fromJson(req.body(), PollUser.class);
                 pollUserDAO.persistPollUser(user);
 
-                Long id = user.getId();
-
                 return user.toJson();
 
             }catch (Exception e) {
@@ -334,7 +322,6 @@ public class PollMain {
                 Vote tempVote = gson.fromJson(req.body(), Vote.class);
                 voteDAO.persistVote(tempVote);
 
-                Long id = tempVote.getId();
 
                 return tempVote.toJson();
 

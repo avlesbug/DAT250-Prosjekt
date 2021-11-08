@@ -26,9 +26,12 @@ public class PollUserDAO{
         stop(em);
     }
 
-    public void updatePollUser(PollUser pollUser){
+    public void updatePollUser(PollUser newUser, Long id){
         EntityManager em = start();
-        em.merge(pollUser);
+        PollUser oldUser = findById(id);
+        newUser.setPollList(oldUser.getPollList());
+        newUser.setId(oldUser.getId());
+        em.merge(newUser);
         stop(em);
     }
 
