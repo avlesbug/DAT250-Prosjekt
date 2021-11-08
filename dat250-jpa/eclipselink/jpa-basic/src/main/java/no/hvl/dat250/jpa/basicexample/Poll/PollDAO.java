@@ -10,30 +10,36 @@ public class PollDAO {
     private static EntityManagerFactory factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
 
 
-    public void persistPoll(Poll poll) {
+    public EntityManager start(){
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
-        PollUser pollUser = em.find(PollUser.class,poll.getPollUserId());
-        em.persist(poll);
-        poll.setPollUser(pollUser);
-        pollUser.addPoll(poll);
+        return  em;
+    }
+
+    public void stop(EntityManager em){
         em.getTransaction().commit();
         em.close();
     }
 
+    public void persistPoll(Poll poll) {
+        EntityManager em = start();
+        PollUser pollUser = em.find(PollUser.class,poll.getPollUserId());
+        em.persist(poll);
+        poll.setPollUser(pollUser);
+        pollUser.addPoll(poll);
+        stop(em);
+    }
+
     public void updatePoll(Poll poll){
-        EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityManager em = start();
         em.merge(poll);
-        em.getTransaction().commit();
-        em.close();
+        stop(em);
     }
 
 
 
     public void deletePoll(Poll poll){
-        EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityManager em = start();
         PollUser user = poll.getPollUser();
         if(user!=null) {
             user.removePoll(poll);
@@ -59,32 +65,26 @@ public class PollDAO {
     }
 
     public List<Poll> getPolls(){
-        EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityManager em = start();
         Query q = em.createQuery("select p from Poll p");
         List<Poll> allPolls = q.getResultList();
-        em.getTransaction().commit();
-        em.close();
+        stop(em);
         return allPolls;
     }
 
     public Poll findById(Long id){
-        EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityManager em = start();
         Poll poll = em.find(Poll.class,id);
-        em.getTransaction().commit();
-        em.close();
+        stop(em);
         return poll;
     }
 
     public String getVotesforPoll(Long id){
-        EntityManager em = factory.createEntityManager();
-        em.getTransaction().begin();
+        EntityManager em = start();
         Poll poll = em.find(Poll.class,id);
         int opt1Votes = poll.getOpt1Votes();
         int opt2Votes = poll.getOpt2Votes();
-        em.getTransaction().commit();
-        em.close();
+        stop(em);
         return poll.getOpt1().toString() + " votes: " + opt1Votes + ", " + poll.getOpt2().toString() +" votes " + opt2Votes;
     }
 }
