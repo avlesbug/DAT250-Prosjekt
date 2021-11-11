@@ -335,10 +335,14 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 PollUser user = gson.fromJson(req.body(), PollUser.class);
-                String password = user.getPassword();
-                user.setPassword(SCryptUtil.scrypt(password,16384,8,1));
-                pollUserDAO.persistPollUser(user);
-                return user.toJson();
+                if(pollUserDAO.findByMail(user.getEmail())== null){
+                    String password = user.getPassword();
+                    user.setPassword(SCryptUtil.scrypt(password,16384,8,1));
+                    pollUserDAO.persistPollUser(user);
+                    return user.toJson();
+                }else {
+                    return gson.toJson("There is already an account associated with this email..");
+                }
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong... Make sure the format is correct");
@@ -351,7 +355,7 @@ public class PollMain {
                 return gson.toJson(pollUserDAO.login(login));
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Could not login.. Check email and password and try again.");
+                return gson.toJson("Something went wrong... Make sure the format is correct");
             }
         });
         post("/votes", (req, res) -> {
