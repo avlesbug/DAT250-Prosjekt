@@ -348,13 +348,10 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 LoginForm login = gson.fromJson(req.body(), LoginForm.class);
-                if(pollUserDAO.login(login)) {
-                    return gson.toJson("Successfully logged in");
-                }
-                return gson.toJson("Could not login.. Check email and password and try again.");
+                return gson.toJson(pollUserDAO.login(login));
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong... Make sure the format is correct");
+                return gson.toJson("Could not login.. Check email and password and try again.");
             }
         });
         post("/votes", (req, res) -> {
