@@ -3,10 +3,12 @@ package no.hvl.dat250.jpa.basicexample.Poll;
 import com.google.gson.Gson;
 import spark.Filter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -24,7 +26,8 @@ public class PollMain {
 
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+        FirestoreHandler fs = new FirestoreHandler();
 
         factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         EntityManager em = factory.createEntityManager();
@@ -39,8 +42,8 @@ public class PollMain {
         boolean createNewEntries = (q.getResultList().size() == 0);
 
         if (createNewEntries) {
-            PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", "Passord123");
-            PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", "Passord123");
+            PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", SCryptUtil.scrypt("Passord123",16384,8,1));
+            PollUser pollUser2 = new PollUser("Maxine Musterwoman", "maxint.musterwoman@gmail.com", SCryptUtil.scrypt("Passord123",16384,8,1));
 
             em.getTransaction().begin();
 
@@ -183,7 +186,17 @@ public class PollMain {
                 return gson.toJson("Could not find user... Make sure the ID is correct");
             }
         });
-
+        get("/userByMail/:email", (req, res) -> {
+            Gson gson = new Gson();
+            try{
+                String email = req.params("email");
+                System.out.println(email);
+                return pollUserDAO.findByMail(email).toJson();
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Could not find user... Make sure the ID is correct");
+            }
+        });
         get("/votes", (req, res) -> {
             Gson gson = new Gson();
             StringBuilder string = new StringBuilder();
@@ -229,7 +242,23 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 Long id = Long.parseLong(req.params("id"));
+                fs.addResult(pollDAO.getResults(id));
                 return gson.toJson(pollDAO.getResults(id));
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Could not find votes... Make sure the user ID is correct");
+            }
+        });
+        get("/results", (req, res) -> {
+            Gson gson = new Gson();
+            List<Result> results = new ArrayList<>();
+            try {
+                for(Poll p : pollDAO.getPolls()){
+                    Result result = pollDAO.getResults(p);
+                    fs.addResult(result);
+                    results.add(result);
+                }
+                return gson.toJson(results);
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Could not find votes... Make sure the user ID is correct");
@@ -306,16 +335,28 @@ public class PollMain {
             Gson gson = new Gson();
             try {
                 PollUser user = gson.fromJson(req.body(), PollUser.class);
+                String password = user.getPassword();
+                user.setPassword(SCryptUtil.scrypt(password,16384,8,1));
                 pollUserDAO.persistPollUser(user);
-
                 return user.toJson();
-
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
                 return gson.toJson("Something went wrong... Make sure the format is correct");
             }
         });
-
+        post("login", (req, res) -> {
+            Gson gson = new Gson();
+            try {
+                LoginForm login = gson.fromJson(req.body(), LoginForm.class);
+                if(pollUserDAO.login(login)) {
+                    return gson.toJson("Successfully logged in");
+                }
+                return gson.toJson("Could not login.. Check email and password and try again.");
+            }catch (Exception e) {
+                System.out.println(e.getStackTrace());
+                return gson.toJson("Something went wrong... Make sure the format is correct");
+            }
+        });
         post("/votes", (req, res) -> {
             Gson gson = new Gson();
             try{

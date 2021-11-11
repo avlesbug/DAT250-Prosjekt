@@ -99,7 +99,7 @@ public class PollUser {
     static ExclusionStrategy strategy = new ExclusionStrategy() {
         @Override
         public boolean shouldSkipField(FieldAttributes field) {
-            if (field.getDeclaringClass() == PollUser.class && field.getName().equals("pollList")) {
+            if (field.getDeclaringClass() == PollUser.class && (field.getName().equals("pollList") || field.getName().equals("password"))) {
                 return true;
             }
             return false;

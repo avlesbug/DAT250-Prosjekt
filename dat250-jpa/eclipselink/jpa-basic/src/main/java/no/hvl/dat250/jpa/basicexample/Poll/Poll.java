@@ -28,8 +28,8 @@ public class Poll {
         name = "Unnamed poll";
         question = "undefined question";
         isPrivate = false;
-        this.opt1 = Answer.YES;
-        this.opt2 = Answer.NO;
+        opt1 = Answer.YES;
+        opt2 = Answer.NO;
     }
 
     public Poll(String name, String question,boolean isPrivate, Long pollUserId, Answer opt1, Answer opt2, LocalDate endDate){

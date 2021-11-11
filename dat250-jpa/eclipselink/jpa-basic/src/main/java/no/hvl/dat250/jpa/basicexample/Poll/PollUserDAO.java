@@ -1,6 +1,7 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
 import javax.persistence.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,4 +70,20 @@ public class PollUserDAO{
         return pollIds;
     }
 
+    public PollUser findByMail(String email){
+        EntityManager em = start();
+        for(PollUser p : getUsers()){
+            if(p.getEmail().equals(email)){
+                return p;
+            }
+        }
+        stop(em);
+        return null;
+    }
+
+    public Boolean login(LoginForm login){
+        PollUser user = findByMail(login.getEmail());
+        String passwordIn = login.getPassword();
+        return SCryptUtil.check(passwordIn,user.getPassword());
+    }
 }

@@ -1,0 +1,4 @@
+<env-variables>
+    <env-var name="GOOGLE_APPLICATION_CREDENTIALS"
+             value="C:\Users\krist\IdeaProjects\DAT250-Prosjekt\dat250-jpa\eclipselink\jpa-basic\src/dat-250-61807abca26b.json" />
+</env-variables>
