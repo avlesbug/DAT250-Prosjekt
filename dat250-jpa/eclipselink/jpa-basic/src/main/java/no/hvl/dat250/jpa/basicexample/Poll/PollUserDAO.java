@@ -81,9 +81,13 @@ public class PollUserDAO{
         return null;
     }
 
-    public Boolean login(LoginForm login){
+    public Long login(LoginForm login){
         PollUser user = findByMail(login.getEmail());
         String passwordIn = login.getPassword();
-        return SCryptUtil.check(passwordIn,user.getPassword());
+        if(SCryptUtil.check(passwordIn,user.getPassword())){
+            return user.getId();
+        } else {
+            return new Long(0);
+        }
     }
 }
