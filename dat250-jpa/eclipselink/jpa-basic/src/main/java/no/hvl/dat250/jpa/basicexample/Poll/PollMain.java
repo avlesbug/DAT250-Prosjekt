@@ -54,7 +54,7 @@ public class PollMain {
             Long userId = pollUser.getId();
             Long userId2 = pollUser2.getId();
 
-            LocalDate endDate = LocalDate.of(2021,12,16);
+            String endDate = LocalDate.of(2021,12,16).toString();
 
             Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId, Answer.YES, Answer.NO,endDate);
             Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2,Answer.YES, Answer.NO,endDate);
@@ -348,7 +348,7 @@ public class PollMain {
                 return gson.toJson("Something went wrong... Make sure the format is correct");
             }
         });
-        post("login", (req, res) -> {
+        post("/login", (req, res) -> {
             Gson gson = new Gson();
             try {
                 LoginForm login = gson.fromJson(req.body(), LoginForm.class);
