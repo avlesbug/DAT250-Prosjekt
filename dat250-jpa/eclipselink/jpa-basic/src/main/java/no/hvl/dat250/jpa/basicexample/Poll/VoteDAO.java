@@ -19,13 +19,17 @@ public class VoteDAO {
         em.close();
     }
 
-    public void persistVote(Vote vote){
+    public boolean persistVote(Vote vote){
         EntityManager em = start();
         em.persist(vote);
         Poll tempPoll = em.find(Poll.class, vote.getPollId());
-        vote.setPoll(tempPoll);
-        tempPoll.addVote(vote);
+        if(tempPoll.isActive()) {
+            vote.setPoll(tempPoll);
+            tempPoll.addVote(vote);
+            return true;
+        }
         stop(em);
+        return false;
     }
 
     public void updateVote(Vote newVote,Long id){

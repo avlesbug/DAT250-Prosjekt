@@ -55,7 +55,7 @@ public class PollMain {
             Long userId2 = pollUser2.getId();
 
             String endDate = LocalDate.of(2021,12,16).toString();
-
+/**
             Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId, Answer.YES, Answer.NO,endDate);
             Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2,Answer.YES, Answer.NO,endDate);
 
@@ -85,7 +85,7 @@ public class PollMain {
                 newVotes.add(newVote);
             }
             poll.setVotes(newVotes);
-
+**/
             em.getTransaction().commit();
             em.close();
         }
@@ -362,14 +362,15 @@ public class PollMain {
             Gson gson = new Gson();
             try{
                 Vote tempVote = gson.fromJson(req.body(), Vote.class);
-                voteDAO.persistVote(tempVote);
-
-
-                return tempVote.toJson();
+                if(voteDAO.persistVote(tempVote)) {
+                    return tempVote.toJson();
+                }else {
+                    return gson.toJson("Poll has expired...");
+                }
 
             }catch (Exception e) {
                 System.out.println(e.getStackTrace());
-                return gson.toJson("Something went wrong... Make sure the format is correct");
+                return gson.toJson("Something went wrong... Make sure the poll has not ended and the format is correct");
             }
         });
 

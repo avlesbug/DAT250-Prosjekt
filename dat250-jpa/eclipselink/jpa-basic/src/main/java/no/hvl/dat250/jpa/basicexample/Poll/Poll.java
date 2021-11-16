@@ -22,8 +22,7 @@ public class Poll {
     private boolean isPrivate;
     private Answer opt1;
     private Answer opt2;
-    private String endDate;
-    private boolean isActive;
+    private LocalDate endDate;
 
     public Poll(){
         name = "Unnamed poll";
@@ -31,7 +30,6 @@ public class Poll {
         isPrivate = false;
         opt1 = Answer.YES;
         opt2 = Answer.NO;
-        isActive = true;
     }
 
     public Poll(String name, String question,boolean isPrivate, Long pollUserId, Answer opt1, Answer opt2, String endDate){
@@ -42,9 +40,7 @@ public class Poll {
         this.pollUserId = pollUserId;
         this.opt1 = opt1;
         this.opt2 = opt2;
-        this.endDate = endDate;
-        isActive = true;
-
+        this.endDate = LocalDate.parse(endDate);
     }
 
     public void setId(Long id) {
@@ -96,11 +92,18 @@ public class Poll {
         this.isPrivate = isPrivate;
     }
 
-    public void setActive(boolean active) { isActive = active; }
 
-    public boolean isActive() { return isActive; }
+    public boolean isActive() {
+        LocalDate today = LocalDate.now();
+        LocalDate end = LocalDate.from(endDate);
+        if(today.isAfter(end)){
+            return false;
+        } else{
+            return true;
+        }
+    }
 
-    public String getEndDate() { return endDate; }
+    public LocalDate getEndDate() { return endDate; }
 
     @OneToOne
     private PollUser pollUser;
