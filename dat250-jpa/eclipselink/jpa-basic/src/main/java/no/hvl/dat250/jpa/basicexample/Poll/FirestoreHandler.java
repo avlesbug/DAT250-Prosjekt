@@ -1,10 +1,8 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.*;
 
-import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -45,7 +43,6 @@ public class FirestoreHandler{
         DocumentReference docRef = db.collection("polls").document("pollId: " + pollResult.getPollId());
         Map<String, Object> data = new HashMap<>();
         data.put("pollId", pollResult.getPollId());
-        data.put("Poll name", pollResult.getName());
         data.put("userId", pollResult.getUserId());
         data.put("question", pollResult.getQuestion());
         data.put("Answer option 1", pollResult.getOpt1());
@@ -66,5 +63,18 @@ public class FirestoreHandler{
             addResult(result);
         }
     }
+
+    public void delete(Poll poll){
+        DocumentReference docRef = db.collection("polls").document("pollId: " + poll.getId());
+        docRef.delete();
+    }
+
+    public void delete(){
+        PollDAO pollDAO = new PollDAO();
+        for(Poll p : pollDAO.getPolls()){
+            delete(p);
+        }
+    }
+
 
 }

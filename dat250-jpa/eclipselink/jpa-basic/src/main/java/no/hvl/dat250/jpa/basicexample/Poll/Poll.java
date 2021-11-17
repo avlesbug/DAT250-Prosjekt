@@ -16,7 +16,6 @@ public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String name;
     private String question;
     private Long pollUserId;
     private boolean isPrivate;
@@ -25,7 +24,6 @@ public class Poll {
     private String endDate;
 
     public Poll(){
-        name = "Unnamed poll";
         question = "undefined question";
         isPrivate = false;
         opt1 = Answer.YES;
@@ -34,7 +32,6 @@ public class Poll {
 
     public Poll(String name, String question,boolean isPrivate, Long pollUserId, Answer opt1, Answer opt2, String endDate){
 
-        this.name = name;
         this.question = question;
         this.isPrivate = isPrivate;
         this.pollUserId = pollUserId;
@@ -50,14 +47,6 @@ public class Poll {
     @Id
     public Long getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Answer getOpt1(){ return opt1; }

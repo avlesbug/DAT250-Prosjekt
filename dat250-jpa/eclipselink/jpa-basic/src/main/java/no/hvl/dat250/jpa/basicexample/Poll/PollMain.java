@@ -386,6 +386,7 @@ public class PollMain {
                 Long id = Long.parseLong(req.params("id"));
                 Poll deletedPoll = pollDAO.findById(id);
                 pollDAO.deletePoll(deletedPoll);
+                fs.delete(deletedPoll);
                 return gson.toJson("Deleted poll: " + deletedPoll.toJson());
 
             }catch (Exception e) {
@@ -398,6 +399,7 @@ public class PollMain {
             try {
                 for(Poll poll : pollDAO.getPolls()){
                     pollDAO.deletePoll(poll);
+                    fs.delete();
                 }
                 return gson.toJson(pollDAO.getPolls());
             }catch (Exception e) {

@@ -3,8 +3,9 @@ package no.hvl.dat250.jpa.basicexample.Poll;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.text.DecimalFormat;
+
 public class Result {
-    private String name;
     private String question;
     private Answer opt1;
     private Answer opt2;
@@ -15,8 +16,7 @@ public class Result {
     private Long pollId;
     private Long userId;
 
-    public Result(String name, String question,Answer opt1, Answer opt2, Long pollId, Long userId, int votesFor1, int votesFor2){
-        this.name = name;
+    public Result(String question,Answer opt1, Answer opt2, Long pollId, Long userId, int votesFor1, int votesFor2){
         this.question = question;
         this.opt1 = opt1;
         this.opt2 = opt2;
@@ -44,10 +44,6 @@ public class Result {
         return jsonInString;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public Long getPollId() {
         return this.pollId;
     }
@@ -73,11 +69,11 @@ public class Result {
     }
 
     public double getVotesFor1Percent() {
-        return votesFor1Percent;
+        return Math.round(votesFor1Percent * 100.0) / 100.0;
     }
 
     public double getVotesFor2Percent() {
-        return votesFor2Percent;
+        return Math.round(votesFor2Percent * 100.0) / 100.0;
     }
 
     public Long getUserId() {

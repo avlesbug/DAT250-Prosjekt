@@ -94,12 +94,12 @@ public class PollDAO {
 
     public Result getResults(Long id) {
         Poll poll = findById(id);
-        Result result = new Result(poll.getName(), poll.getQuestion(),poll.getOpt1(),poll.getOpt2(),poll.getId(),poll.getPollUserId(),poll.getOpt1Votes(),poll.getOpt2Votes());
+        Result result = new Result(poll.getQuestion(),poll.getOpt1(),poll.getOpt2(),poll.getId(),poll.getPollUserId(),poll.getOpt1Votes(),poll.getOpt2Votes());
 
         return result;
     }
     public Result getResults(Poll poll) {
-        Result result = new Result(poll.getName(), poll.getQuestion(),poll.getOpt1(),poll.getOpt2(),poll.getId(),poll.getPollUserId(),poll.getOpt1Votes(),poll.getOpt2Votes());
+        Result result = new Result(poll.getQuestion(),poll.getOpt1(),poll.getOpt2(),poll.getId(),poll.getPollUserId(),poll.getOpt1Votes(),poll.getOpt2Votes());
 
         return result;
     }
