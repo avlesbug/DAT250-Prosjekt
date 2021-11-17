@@ -56,7 +56,7 @@ public class PollMain {
             Long userId2 = pollUser2.getId();
 
             String endDate = LocalDate.of(2021,12,16).toString();
-/**
+
             Poll poll = new Poll("My first poll", "Can you attend my birthday party?", true, userId, Answer.YES, Answer.NO,endDate);
             Poll poll2 = new Poll("My second poll", "Can you host my birthday party?", false, userId2,Answer.YES, Answer.NO,endDate);
 
@@ -86,7 +86,6 @@ public class PollMain {
                 newVotes.add(newVote);
             }
             poll.setVotes(newVotes);
-**/
             em.getTransaction().commit();
             em.close();
         }
