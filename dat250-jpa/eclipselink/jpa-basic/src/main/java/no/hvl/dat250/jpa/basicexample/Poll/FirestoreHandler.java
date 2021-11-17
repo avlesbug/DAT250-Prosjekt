@@ -18,11 +18,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class FirestoreHandler {
+public class FirestoreHandler implements Runnable{
     String projectId = "57796962883";
     Firestore db;
 
@@ -38,19 +40,6 @@ public class FirestoreHandler {
         db = FirestoreClient.getFirestore();
     }
 
-    public void addData() throws ExecutionException, InterruptedException {
-        DocumentReference docRef = db.collection("users").document("alovelace");
-        // Add document data  with id "alovelace" using a hashmap
-        Map<String, Object> data = new HashMap<>();
-        data.put("first", "Ada");
-        data.put("last", "Lovelace");
-        data.put("born", 1815);
-        //asynchronously write data
-        ApiFuture<WriteResult> result = docRef.set(data);
-        // ...
-        // result.get() blocks on response
-        System.out.println("Update time : " + result.get().getUpdateTime());
-    }
 
     public void addResult(Result pollResult) throws ExecutionException, InterruptedException {
         DocumentReference docRef = db.collection("polls").document("pollId: " + pollResult.getPollId());
@@ -68,5 +57,24 @@ public class FirestoreHandler {
         //asynchronously write data
         ApiFuture<WriteResult> result = docRef.set(data);
         System.out.println("Update time : " + result.get().getUpdateTime());
+    }
+
+    @Override
+    public void run() {
+        while(true) {
+            PollDAO pollDAO = new PollDAO();
+            for (Poll p : pollDAO.getPolls()) {
+                Result result = pollDAO.getResults(p);
+                try {
+                    addResult(result);
+                    Thread.sleep(60000);
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
     }
 }

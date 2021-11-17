@@ -28,7 +28,6 @@ public class PollMain {
 
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         FirestoreHandler fs = new FirestoreHandler();
-
         factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         EntityManager em = factory.createEntityManager();
 
@@ -40,6 +39,8 @@ public class PollMain {
 
         // do we have entries?
         boolean createNewEntries = (q.getResultList().size() == 0);
+
+
 
         if (createNewEntries) {
             PollUser pollUser = new PollUser("Max Musterman", "max.musterman@gmail.com", SCryptUtil.scrypt("Passord123",16384,8,1));
@@ -478,7 +479,7 @@ public class PollMain {
                 return gson.toJson("Something went wrong...");
             }
         });
-
+        //fs.run();
     }
 
 }

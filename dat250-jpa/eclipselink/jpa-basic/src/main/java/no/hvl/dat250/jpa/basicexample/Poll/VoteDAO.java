@@ -21,11 +21,13 @@ public class VoteDAO {
 
     public boolean persistVote(Vote vote){
         EntityManager em = start();
-        em.persist(vote);
+
         Poll tempPoll = em.find(Poll.class, vote.getPollId());
         if(tempPoll.isActive()) {
             vote.setPoll(tempPoll);
             tempPoll.addVote(vote);
+            em.persist(vote);
+            stop(em);
             return true;
         }
         stop(em);
