@@ -479,7 +479,7 @@ public class PollMain {
                 return gson.toJson("Something went wrong...");
             }
         });
-        //fs.run();
+        fs.run();
     }
 
 }

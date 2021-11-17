@@ -22,7 +22,7 @@ public class Poll {
     private boolean isPrivate;
     private Answer opt1;
     private Answer opt2;
-    private LocalDate endDate;
+    private String endDate;
 
     public Poll(){
         name = "Unnamed poll";
@@ -40,7 +40,7 @@ public class Poll {
         this.pollUserId = pollUserId;
         this.opt1 = opt1;
         this.opt2 = opt2;
-        this.endDate = LocalDate.parse(endDate);
+        this.endDate = endDate;
     }
 
     public void setId(Long id) {
@@ -95,7 +95,7 @@ public class Poll {
 
     public boolean isActive() {
         LocalDate today = LocalDate.now();
-        LocalDate end = LocalDate.from(endDate);
+        LocalDate end = LocalDate.parse(endDate);
         if(today.isAfter(end)){
             return false;
         } else{
@@ -103,7 +103,7 @@ public class Poll {
         }
     }
 
-    public LocalDate getEndDate() { return endDate; }
+    public String getEndDate() { return endDate; }
 
     @OneToOne
     private PollUser pollUser;

@@ -1,6 +1,7 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Result {
     private String name;
@@ -34,7 +35,9 @@ public class Result {
 
 
     public String toJson(){
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder()
+                .serializeSpecialFloatingPointValues()
+                .serializeNulls().create();
 
         String jsonInString = gson.toJson(this);
 
