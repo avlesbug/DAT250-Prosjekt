@@ -271,6 +271,7 @@ public class PollMain {
                 Long id = Long.parseLong(req.params("id"));
                 Poll newPoll = gson.fromJson(req.body(), Poll.class);
                 pollDAO.updatePoll(newPoll,id);
+                fs.update();
                 return newPoll.toJson();
 
             }catch (Exception e) {
@@ -302,6 +303,7 @@ public class PollMain {
 
                 if(tempVote.getAnswer()!= null) {
                     voteDAO.updateVote(tempVote,id);
+                    fs.update();
                 } else {
                     return gson.toJson("Invalid answer");
                 }
@@ -322,6 +324,7 @@ public class PollMain {
             try {
                 Poll tempPoll = gson.fromJson(req.body(), Poll.class);
                 pollDAO.persistPoll(tempPoll);
+                fs.update();
 
                 return tempPoll.toJson();
             }catch (Exception e) {
@@ -363,6 +366,7 @@ public class PollMain {
             try{
                 Vote tempVote = gson.fromJson(req.body(), Vote.class);
                 if(voteDAO.persistVote(tempVote)) {
+                    fs.update();
                     return tempVote.toJson();
                 }else {
                     return gson.toJson("Poll has expired...");
@@ -478,7 +482,6 @@ public class PollMain {
                 return gson.toJson("Something went wrong...");
             }
         });
-        fs.run();
     }
 
 }

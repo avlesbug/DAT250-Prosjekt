@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class FirestoreHandler implements Runnable{
+public class FirestoreHandler{
     String projectId = "57796962883";
     Firestore db;
 
@@ -56,26 +56,15 @@ public class FirestoreHandler implements Runnable{
         data.put("Votes for option 2%", pollResult.getVotesFor2Percent());
         //asynchronously write data
         ApiFuture<WriteResult> result = docRef.set(data);
-        //System.out.println("Update time : " + result.get().getUpdateTime());
+        System.out.println("Update time : " + result.get().getUpdateTime());
     }
 
-    @Override
-    public void run() {
-        while(true) {
-            PollDAO pollDAO = new PollDAO();
-            for (Poll p : pollDAO.getPolls()) {
-                Result result = pollDAO.getResults(p);
-                try {
-                    addResult(result);
-                    //System.out.println(result.toJson());
-                    Thread.sleep(10000);
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
+    public void update() throws ExecutionException, InterruptedException {
+        PollDAO pollDAO = new PollDAO();
+        for(Poll p : pollDAO.getPolls()){
+            Result result = pollDAO.getResults(p);
+            addResult(result);
         }
     }
+
 }
