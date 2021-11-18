@@ -2,6 +2,7 @@
 package no.hvl.dat250.jpa.basicexample.Poll;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

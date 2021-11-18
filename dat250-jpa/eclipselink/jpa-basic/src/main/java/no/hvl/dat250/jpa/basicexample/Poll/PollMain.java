@@ -144,6 +144,7 @@ public class PollMain {
             }
         });
 
+
         get("/pollsforuser/:id", (req, res) -> {
             Gson gson = new Gson();
             try {
@@ -272,6 +273,11 @@ public class PollMain {
                 Poll newPoll = gson.fromJson(req.body(), Poll.class);
                 pollDAO.updatePoll(newPoll,id);
                 fs.update();
+                if(pollDAO.findById(newPoll.getId()).getEndDate()==LocalDate.now().toString()){
+                    //Do dweet.io & messaging stuff
+                    System.out.println("Dweet.io: Poll benn closed.");
+                    System.out.println("RabbitMQ: These are the results.");
+                }
                 return newPoll.toJson();
 
             }catch (Exception e) {

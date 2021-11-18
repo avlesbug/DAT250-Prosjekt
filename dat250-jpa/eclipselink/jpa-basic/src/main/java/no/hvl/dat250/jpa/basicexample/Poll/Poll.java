@@ -81,6 +81,9 @@ public class Poll {
         this.isPrivate = isPrivate;
     }
 
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
 
     public boolean isActive() {
         LocalDate today = LocalDate.now();
