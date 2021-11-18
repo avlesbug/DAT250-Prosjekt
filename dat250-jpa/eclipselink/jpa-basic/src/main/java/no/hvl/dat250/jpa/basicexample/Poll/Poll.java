@@ -85,6 +85,8 @@ public class Poll {
         this.endDate = endDate;
     }
 
+    public String getEndDate() { return endDate; }
+
     public boolean isActive() {
         LocalDate today = LocalDate.now();
         LocalDate end = LocalDate.parse(endDate);
@@ -95,7 +97,7 @@ public class Poll {
         }
     }
 
-    public String getEndDate() { return endDate; }
+
 
     @OneToOne
     private PollUser pollUser;
