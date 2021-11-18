@@ -18,6 +18,7 @@ import javax.persistence.Query;
 import static org.junit.Assert.assertTrue;
 import static spark.Spark.*;
 import static spark.Spark.delete;
+import no.hvl.dat250.jpa.basicexample.Poll.DweetHandler;
 
 public class PollMain {
     private static final String PERSISTENCE_UNIT_NAME = "people";
@@ -30,6 +31,7 @@ public class PollMain {
         FirestoreHandler fs = new FirestoreHandler();
         factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         EntityManager em = factory.createEntityManager();
+        DweetHandler dweeter = new DweetHandler();
 
 
 
@@ -277,6 +279,7 @@ public class PollMain {
                 if(poll.getEndDate().equals(LocalDate.now().toString())){
                     //Do dweet.io & messaging stuff
                     System.out.println("Dweet.io: Poll has been closed.");
+                    dweeter.pollCloseCast(poll.getId(), poll.getOpt1Votes(), poll.getOpt2Votes());
                     System.out.println("RabbitMQ: These are the results.");
                 }
                 return newPoll.toJson();
@@ -332,7 +335,7 @@ public class PollMain {
                 Poll tempPoll = gson.fromJson(req.body(), Poll.class);
                 pollDAO.persistPoll(tempPoll);
                 fs.update();
-
+                dweeter.pollCreateCast(tempPoll.getId(), tempPoll.getQuestion(), tempPoll.getEndDate());
                 return tempPoll.toJson();
             }catch (Exception e) {
                 return gson.toJson("Something went wrong... Make sure the format is correct");
@@ -372,6 +375,7 @@ public class PollMain {
             Gson gson = new Gson();
             try{
                 Vote tempVote = gson.fromJson(req.body(), Vote.class);
+                dweeter.pollVoteCast(tempVote.getPollId(), tempVote.getAnswer());
                 if(voteDAO.persistVote(tempVote)) {
                     fs.update();
                     return tempVote.toJson();
