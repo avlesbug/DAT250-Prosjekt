@@ -18,7 +18,7 @@ import javax.persistence.Query;
 import static org.junit.Assert.assertTrue;
 import static spark.Spark.*;
 import static spark.Spark.delete;
-import no.hvl.dat250.jpa.basicexample.Poll.DweetHandler;
+
 
 public class PollMain {
     private static final String PERSISTENCE_UNIT_NAME = "people";
@@ -27,13 +27,15 @@ public class PollMain {
 
 
 
-    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         FirestoreHandler fs = new FirestoreHandler();
         factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
         EntityManager em = factory.createEntityManager();
         DweetHandler dweeter = new DweetHandler();
-
-
+        subscriptionReciever sReciever = new subscriptionReciever();
+        subscriptionUpdater sUpdater = new subscriptionUpdater();
+        AnalyticsHandler analyticsJanitor = new AnalyticsHandler();
+        analyticsJanitor.analyticsReceiver();
 
         // read the existing entries
         Query q = em.createQuery("select u from PollUser u");
@@ -281,6 +283,8 @@ public class PollMain {
                     System.out.println("Dweet.io: Poll has been closed.");
                     dweeter.pollCloseCast(poll.getId(), poll.getOpt1Votes(), poll.getOpt2Votes());
                     System.out.println("RabbitMQ: These are the results.");
+                    sUpdater.sendUpdate(poll.getQuestion(), poll.getId(), poll.getOpt1Votes(), poll.getOpt2Votes());
+                    analyticsJanitor.sendAnalytics(poll.getId(), poll.getOpt1Votes(), poll.getOpt2Votes());
                 }
                 return newPoll.toJson();
 
@@ -377,6 +381,7 @@ public class PollMain {
                 Vote tempVote = gson.fromJson(req.body(), Vote.class);
                 dweeter.pollVoteCast(tempVote.getPollId(), tempVote.getAnswer());
                 if(voteDAO.persistVote(tempVote)) {
+                    sReciever.startReciever();
                     fs.update();
                     return tempVote.toJson();
                 }else {
